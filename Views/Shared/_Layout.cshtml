@@ -23,7 +23,7 @@
     <!-- Custom Design System -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body>
+<body data-authenticated="@(User.Identity?.IsAuthenticated == true ? "true" : "false")">
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container-fluid max-w-7xl">

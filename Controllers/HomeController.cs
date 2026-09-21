@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +54,7 @@ namespace TripAnalyzer.Controllers
             return View(new ContactViewModel());
         }
 
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [EnableRateLimiting("contact")]

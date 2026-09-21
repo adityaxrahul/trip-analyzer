@@ -1,171 +1,524 @@
-# TRIP ANALYZER
-### Intelligent Multi-Modal Travel & Route Analysis Platform
+Trip Analyzer 🧭
+Trip Analyzer is an AI-powered full-stack travel planning and trip analysis web application built with ASP.NET Core MVC (.NET 10). It combines trip analysis, travel recommendations, routing, fare calculation, geographic data, AI assistance, authentication, user management, responsive UI, Docker, and cloud deployment.
 
-**Trip Analyzer** is an enterprise-grade ASP.NET Core MVC (.NET 10) travel intelligence platform designed to evaluate and compare multi-modal transport options (Train, Bus, Flight, Driving) across India and global destinations. It delivers personalized recommendations based on Cost, Duration, Availability, and Comfort with interactive Google Maps route mapping, AI assistant support, and comprehensive administrative controls.
-
+🚀 Live Application
+Production: https://trip-analyzer.onrender.com
+GitHub: https://github.com/adityaxrahul/trip-analyzer
 ---
 
-## 🛠️ Technology Stack
 
-- **Framework**: ASP.NET Core MVC (.NET 10)
-- **Database**: PostgreSQL / Neon Serverless Postgres with Entity Framework Core 10 (Npgsql)
-- **Authentication & Security**: ASP.NET Core Identity with session-scoped authentication cookies, Google OAuth 2.0 OpenID Connect integration, and Role-Based Access Control (`Admin`, `User`)
-- **Mapping & Geocoding**: Google Maps JavaScript API (browser client) & Google Routes API (backend server-side calculation with geodesic fallback)
-- **AI & Assistance**: Google Gemini API & Database-driven intelligent chatbot FAQ assistance
-- **Frontend & Design System**: Custom glassmorphism responsive design system (Vanilla CSS & Bootstrap 5) with 3D micro-animations and zero horizontal overflow across all screen viewports (375px to 1920px+)
-- **Analytics**: Chart.js data visualization
-- **Email & Notifications**: SMTP mail service with asynchronous dispatch and fallback logging
-- **Deployment**: Multi-stage Docker container configured for Render and cloud hosts
-
----
-
-## 🌟 Core Features & Responsive Design
-
-1. **Multi-Modal Travel Recommendation Engine**:
-   - Proprietary algorithm normalizing Cost (40%), Duration (30%), Availability (20%), and Comfort (10%).
-   - Classifies options into **Recommended Overall**, **Cheapest**, **Fastest**, and **Most Convenient**.
-   - Generates transparent, natural-language reasoning explaining why a route is recommended.
-
-2. **Interactive Google Maps & Routing**:
-   - Visual route polyline decoding directly between origin and destination with automatic viewport `fitBounds`.
-   - Geodesic straight-line fallback rendering if road routing is unavailable.
-   - Dual-tier key architecture: server-only Routes API key and browser-safe Maps JavaScript API key.
-
-3. **Responsive 3D Travel-Tech UI**:
-   - Fully tested and adapted across mobile (`375px`, `480px`), tablet (`768px`, `1024px`), and desktop (`1440px`, `1920px`).
-   - Clean collapsible mobile navigation, touch targets (>= 44px), and adaptive glassmorphism panels.
-
-4. **Session-Scoped Secure Authentication & Google OAuth**:
-   - Standard password and Google OAuth login flows using non-persistent session cookies (discarded on browser exit).
-   - Automatic account linking for existing email accounts without creating duplicate identities.
-   - Preserves `returnUrl` destination when accessing protected pages like `/Trip/Analyze`.
-
-5. **Strictly Controlled Admin Authority (`/Admin`)**:
-   - Admin access is restricted solely to users explicitly assigned the `Admin` role in Identity.
-   - Normal registrations and Google sign-ins never automatically acquire admin privileges.
-   - Dynamic role management allows administrators to grant or revoke admin rights safely from `/Admin/Users`.
-
----
-
-## 🔐 Environment Variables & Configuration
-
-Configure these variables via `appsettings.Development.json`, .NET User Secrets, or cloud environment variables:
-
-| Variable | Required | Description |
-| :--- | :---: | :--- |
-| `DATABASE_URL` | Yes | PostgreSQL / Neon connection string (`postgres://user:pass@host/db?sslmode=require` or standard Npgsql format) |
-| `ADMIN_EMAIL` | Yes | Initial administrator email address (e.g. `admin@yourdomain.com`) |
-| `ADMIN_PASSWORD` | Yes | Initial administrator password (must be provided securely via environment variables or User Secrets; never committed to source) |
-| `Authentication__Google__ClientId` | Optional | Google OAuth 2.0 Client ID for web sign-in |
-| `Authentication__Google__ClientSecret` | Optional | Google OAuth 2.0 Client Secret (server-side only) |
-| `GOOGLE_MAPS_API_KEY` | Optional | Browser-restricted Google Maps JavaScript API key |
-| `GOOGLE_ROUTES_API_KEY` | Optional | Server-side Google Routes API key |
-| `GEMINI_API_KEY` | Optional | Google Gemini API key for AI assistant features |
-| `SMTP_HOST` | Optional | SMTP mail server hostname (e.g. `smtp.gmail.com`) |
-| `SMTP_PORT` | Optional | SMTP mail server port (e.g. `587`) |
-| `SMTP_USERNAME` | Optional | SMTP username / sender address |
-| `SMTP_PASSWORD` | Optional | SMTP app password |
-
-> [!IMPORTANT]
-> **Security Note**: Never commit real secrets, API keys, or passwords into source code or repository files. Use environment variables in production and .NET User Secrets during local development.
-
----
-
-## 🚀 Local Development Setup
-
-### 1. Prerequisites
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- PostgreSQL database (Local or [Neon Cloud PostgreSQL](https://neon.tech/))
-
-### 2. Configure Local Secrets / Environment
-In your terminal, set your environment variables:
-
-**PowerShell (Windows):**
-```powershell
-$env:DATABASE_URL="postgres://neondb_owner:YOUR_PASSWORD@ep-sample.us-east-2.aws.neon.tech/neondb?sslmode=require"
-$env:ADMIN_EMAIL="admin@tripanalyzer.com"
-$env:ADMIN_PASSWORD="YourSecurePasswordHere!"
-$env:Authentication__Google__ClientId="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
-$env:Authentication__Google__ClientSecret="YOUR_GOOGLE_CLIENT_SECRET"
-$env:GOOGLE_MAPS_API_KEY="YOUR_BROWSER_KEY"
-$env:GOOGLE_ROUTES_API_KEY="YOUR_SERVER_KEY"
+📌 Project Overview
+Trip Analyzer allows visitors to explore travel information publicly while requiring authentication for protected services and user-specific operations.
+Application flow
+```text
+User
+ │
+ ├── Public Website
+ │   ├── Home
+ │   ├── How It Works
+ │   ├── FAQ
+ │   └── Other public information
+ │
+ └── Authenticated Services
+     ├── Trip Analysis
+     ├── AI Chatbot
+     ├── Contact/Enquiry
+     ├── Trip History
+     ├── Profile
+     └── User-specific operations
 ```
-
-**Bash / Zsh (macOS / Linux):**
-```bash
-export DATABASE_URL="postgres://neondb_owner:YOUR_PASSWORD@ep-sample.us-east-2.aws.neon.tech/neondb?sslmode=require"
-export ADMIN_EMAIL="admin@tripanalyzer.com"
-export ADMIN_PASSWORD="YourSecurePasswordHere!"
-export Authentication__Google__ClientId="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
-export Authentication__Google__ClientSecret="YOUR_GOOGLE_CLIENT_SECRET"
-export GOOGLE_MAPS_API_KEY="YOUR_BROWSER_KEY"
-export GOOGLE_ROUTES_API_KEY="YOUR_SERVER_KEY"
+If an anonymous user attempts to use a protected service, the application redirects the user to the login page with a return URL.
+---
+✨ Main Features
+🗺️ Trip Analysis
+Users can analyze trips using travel information and the application's recommendation services.
+Features include:
+Source and destination information
+District/city information
+Transportation options
+Distance calculation
+Fare calculation
+Route information
+Travel duration
+Trip recommendations
+Alternative transportation options
+🤖 AI Travel Chatbot
+The application integrates the Gemini API for AI-powered travel assistance.
+Features include:
+Natural-language travel questions
+Travel assistance
+Suggested questions
+Loading/error handling
+Responsive chatbot UI
+Authenticated service access
+The Gemini API key is supplied through environment configuration and is not intended to be hard-coded in source code.
+🔐 Authentication & Authorization
+The project uses ASP.NET Core Identity.
+Supported functionality includes:
+Registration
+Login
+Logout
+Password policy
+Account lockout
+Google Sign-In
+Profile management
+Change password
+Authenticated sessions
+Return URL handling
+Server-side authorization
+Public pages remain accessible to visitors. Protected operations require authentication.
+📧 Contact & Email
+The application includes a contact/enquiry system and SMTP-based email functionality.
+Configuration uses environment variables such as:
+```text
+SMTP_HOST
+SMTP_PORT
+SMTP_USERNAME
+SMTP_PASSWORD
+ADMIN_EMAIL
 ```
+Sensitive SMTP credentials should never be committed to GitHub.
+🏙️ India Geographic Data
+The application includes seed data for Indian cities and districts:
+```text
+Data/Seed/
+├── 2-district.csv
+├── IndiaCities.csv
+└── IndiaDistricts.csv
+```
+These CSV files are configured to be included in production publish output.
+---
+🛣️ Core Services
+The project separates major application responsibilities into services, including:
+```text
+TripRecommendationService
+ChatbotService
+EmailSenderService
+AdminAnalyticsService
+DistrictService
+DistanceCalculationService
+FareCalculationService
+RoutingService
+```
+This keeps business logic separate from controllers and views.
+---
+🏗️ Technology Stack
+Backend
+C#
+ASP.NET Core MVC
+.NET 10
+Entity Framework Core 10
+ASP.NET Core Identity
+Npgsql
+Database
+PostgreSQL
+Authentication
+ASP.NET Core Identity
+Google Authentication
+Cookie authentication
+AI
+Google Gemini API
+Frontend
+Razor Views
+HTML5
+CSS3
+JavaScript
+Responsive design
+Bootstrap/library assets where used
+Deployment
+Git
+GitHub
+Docker
+Render
+---
+📁 Project Structure
+```text
+Trip Analyzer/
+│
+├── Areas/
+│   └── Admin/
+│       └── Views/
+│
+├── Controllers/
+│
+├── Data/
+│   ├── ApplicationDbContext.cs
+│   ├── DatabaseUrlParser.cs
+│   ├── DbInitializer.cs
+│   └── Seed/
+│       ├── 2-district.csv
+│       ├── IndiaCities.csv
+│       └── IndiaDistricts.csv
+│
+├── Models/
+│
+├── Services/
+│   ├── ChatbotService.cs
+│   ├── DistrictService.cs
+│   ├── DistanceCalculationService.cs
+│   ├── EmailSenderService.cs
+│   ├── FareCalculationService.cs
+│   ├── RoutingService.cs
+│   ├── TripRecommendationService.cs
+│   └── ...
+│
+├── Views/
+│   ├── Account/
+│   ├── Home/
+│   ├── Trip/
+│   └── Shared/
+│
+├── wwwroot/
+│   ├── css/
+│   ├── js/
+│   ├── images/
+│   └── lib/
+│
+├── Migrations/
+├── Program.cs
+├── TripAnalyzer.csproj
+├── Dockerfile
+├── .dockerignore
+├── .gitignore
+└── README.md
+```
+---
+🔄 System Architecture
+```text
+                    ┌─────────────────┐
+                    │      User       │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │   Web Browser   │
+                    └────────┬────────┘
+                             │
+                             ▼
+                 ┌───────────────────────┐
+                 │ ASP.NET Core MVC      │
+                 │ Controllers + Views   │
+                 └───────────┬───────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              ▼              ▼              ▼
+       ┌────────────┐ ┌────────────┐ ┌──────────────┐
+       │  Identity  │ │  Services  │ │  PostgreSQL  │
+       │    Auth    │ │            │ │   Database   │
+       └────────────┘ └─────┬──────┘ └──────────────┘
+                            │
+              ┌─────────────┼──────────────┐
+              ▼             ▼              ▼
+          Gemini API    Routing/Data      SMTP
+          Chatbot       Services          Email
+```
+---
+🗄️ Database
+Trip Analyzer uses PostgreSQL with Entity Framework Core.
+The production database URL is supplied through:
+```text
+DATABASE_URL
+```
+The project includes:
+Entity Framework Core migrations
+Database initialization
+Startup seeding
+ASP.NET Identity tables
+Travel-related data
+District/city data
+Trip-related data
+---
+🔒 Security
+Security-related features include:
+ASP.NET Core Identity
+Password requirements
+Account lockout
+Server-side authorization
+Secure authentication cookies
+HTTPS configuration
+Security response headers
+Environment-based secrets
+Protected user-specific operations
+No intentional hard-coded production API keys
+Sensitive values such as the following must remain outside source control:
+```text
+DATABASE_URL
+GEMINI_API_KEY
+GOOGLE_CLIENT_SECRET
+SMTP_PASSWORD
+```
+---
+📱 Responsive UI
+The frontend is designed to work across:
+Small mobile phones
+Large mobile phones
+Tablets
+Laptops
+Desktop screens
+Large/high-resolution displays
+Responsive improvements focus on:
+Text readability
+Low-contrast text fixes
+Mobile layouts
+Responsive forms
+Responsive cards
+Responsive tables
+Chatbot sizing
+Touch-friendly controls
+Prevention of horizontal overflow
+The existing visual identity is preserved while improving readability and responsiveness.
+---
+⚡ Performance
+Performance considerations include:
+Efficient server-side authorization
+Debounced client-side requests where appropriate
+Prevention of duplicate chatbot submissions
+Responsive layouts
+Production publishing
+Docker multi-stage builds
+Static assets
+Environment-based configuration
+The goal is to keep the application responsive without unnecessary frontend or backend processing.
+---
+🐳 Docker
+The project uses a multi-stage Docker build.
+Build image:
+```text
+mcr.microsoft.com/dotnet/sdk:10.0
+```
+Runtime image:
+```text
+mcr.microsoft.com/dotnet/aspnet:10.0
+```
+The runtime image installs the required Linux GSSAPI/Kerberos dependency:
+```text
+libgssapi-krb5-2
+```
+The application is configured for dynamic deployment ports.
+---
+☁️ Production Deployment
+The production application is deployed on Render.
+```text
+GitHub
+   │
+   ▼
+Render
+   │
+   ├── Docker build
+   ├── ASP.NET Core
+   ├── PostgreSQL
+   ├── Gemini API
+   ├── Google Authentication
+   └── SMTP configuration
+```
+Production URL:
+https://trip-analyzer.onrender.com
+A Git push to the connected production branch can trigger a new Render deployment.
+---
+⚙️ Environment Variables
+Production secrets should be configured in the deployment environment.
+Example configuration:
+```text
+DATABASE_URL=your-postgresql-url
 
-### 3. Build & Run
+GEMINI_API_KEY=your-gemini-api-key
+
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+SMTP_HOST=your-smtp-host
+SMTP_PORT=587
+SMTP_USERNAME=your-email
+SMTP_PASSWORD=your-email-password
+
+ADMIN_EMAIL=your-admin-email
+```
+Use the exact variable names expected by the application's configuration.
+---
+🔑 Google Sign-In
+Google authentication uses the application's callback path:
+```text
+/signin-google
+```
+For production, the Google OAuth configuration should contain the production callback URL:
+```text
+https://trip-analyzer.onrender.com/signin-google
+```
+The Google Client ID and Client Secret must be configured as environment variables.
+---
+🧪 Local Development
+Requirements
+Install:
+.NET 10 SDK
+PostgreSQL
+Git
+Visual Studio or VS Code
+Docker (optional)
+Clone
 ```bash
-# Restore packages and verify build
+git clone https://github.com/adityaxrahul/trip-analyzer.git
+cd trip-analyzer
+```
+Restore
+```bash
+dotnet restore
+```
+Build
+```bash
 dotnet build
-
-# Launch application with HTTPS profile
-dotnet run --launch-profile https
 ```
-The application will launch on `https://localhost:7203` (and `http://localhost:5236`).
-
+Run
+```bash
+dotnet run
+```
 ---
-
-## 🌐 Google OAuth Setup
-
-1. Open the [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
-2. Create an **OAuth 2.0 Client ID** (Application type: *Web application*).
-3. Add Authorized JavaScript Origins:
-   - `https://localhost:7203` (Local)
-   - `https://trip-analyzer.onrender.com` (Production)
-4. Add Authorized Redirect URIs:
-   - `https://localhost:7203/signin-google` (Local)
-   - `https://trip-analyzer.onrender.com/signin-google` (Production)
-5. Save the credentials and provide them via `Authentication__Google__ClientId` and `Authentication__Google__ClientSecret`.
-
+🧹 Clean & Publish
+Clean:
+```bash
+dotnet clean
+```
+Build:
+```bash
+dotnet build
+```
+Publish:
+```bash
+dotnet publish -c Release
+```
+Publish output:
+```text
+bin/Release/net10.0/publish/
+```
 ---
-
-## 🗺️ Google Maps & Routes Setup
-
-1. Enable **Maps JavaScript API** and **Routes API** in Google Cloud Console.
-2. Create two separate API keys:
-   - **`GOOGLE_MAPS_API_KEY`**: Restrict to HTTP referrers (`localhost:7203/*`, `trip-analyzer.onrender.com/*`) and Maps JavaScript API.
-   - **`GOOGLE_ROUTES_API_KEY`**: Restrict to IP / web server calls and Routes API (kept strictly backend-side).
-
+🐳 Docker Commands
+Build the image:
+```bash
+docker build -t trip-analyzer .
+```
+Run locally:
+```bash
+docker run -p 8080:8080 trip-analyzer
+```
 ---
-
-## 🛡️ Admin Setup & Role Security Rules
-
-- **Initial Admin Seeding**: At startup, `DbInitializer` checks `ADMIN_EMAIL` and `ADMIN_PASSWORD`. If configured, it provisions or updates the designated user with the `Admin` role without creating duplicates.
-- **Strict Role Gating**: All controllers under `Areas/Admin/Controllers/` enforce `[Area("Admin")]` and `[Authorize(Roles = "Admin")]`.
-- **Role Isolation**: Normal user registrations and Google logins are assigned the `User` role exclusively.
-- **Admin Delegation**: Existing Administrators can grant or revoke the `Admin` role for any user through `/Admin/Users/Details/{id}`.
-
+🛡️ Authentication Access Model
+Trip Analyzer separates public exploration from protected service usage.
+Anonymous users can
+Open Home
+Read public information
+View FAQ
+View How It Works
+Access Login/Register
+Explore public pages
+Authenticated users can
+Analyze trips
+Use the AI chatbot
+Submit protected enquiries
+View trip history
+Manage profile
+Use user-specific services
+When an anonymous user requests a protected operation, the application redirects to:
+```text
+/Account/Login?ReturnUrl=<requested-url>
+```
+After successful authentication, the user can continue to the requested destination.
+Authorization is enforced on the server and is not dependent only on hiding frontend buttons.
 ---
+📊 Main Modules
+Module	Purpose
+Home	Public landing and travel exploration
+Account	Registration, login, profile and authentication
+Trip	Trip analysis, recommendations and history
+Chatbot	AI-powered travel assistance
+District	Indian district/city data
 
-## ☁️ Production Deployment (Render)
-
-1. Connect your repository to [Render](https://render.com).
-2. Create a new **Web Service** selecting **Docker** environment.
-3. Configure the environment variables in the Render dashboard:
-   - `DATABASE_URL`: Neon PostgreSQL connection string
-   - `ADMIN_EMAIL`: Production admin email
-   - `ADMIN_PASSWORD`: Strong production administrator password
-   - `Authentication__Google__ClientId`: Google OAuth Client ID
-   - `Authentication__Google__ClientSecret`: Google OAuth Client Secret
-   - `GOOGLE_MAPS_API_KEY`: Browser Maps key
-   - `GOOGLE_ROUTES_API_KEY`: Server Routes key
-4. Deploy the service. The multi-stage Docker build handles port binding and starts the application securely.
-
+Routing	Route and distance functionality
+Fare	Transportation fare calculations
+Contact	User enquiry functionality
+Admin	Administrative management and analytics
+Database	PostgreSQL persistence and EF Core
+Authentication	Identity + Google Sign-In
+Email	SMTP email functionality
 ---
+🌱 Development Workflow
+Before pushing changes:
+```bash
+dotnet clean
+dotnet build
+git status
+```
+If the build succeeds:
+```bash
+git add .
+git commit -m "Update Trip Analyzer"
+git push origin main
+```
+---
+🎓 Project Purpose
+Trip Analyzer is a college-level full-stack project demonstrating practical integration of:
+Web application development
+MVC architecture
+Database management
+Authentication and authorization
+AI integration
+Travel/geographic data
+Route and fare calculation
+Responsive UI
+Security
+Docker
+Git/GitHub
+Cloud deployment
+The project demonstrates a complete development and deployment workflow:
+```text
+Planning
+   ↓
+UI / UX
+   ↓
+ASP.NET Core Development
+   ↓
+Database Integration
+   ↓
+Authentication
+   ↓
+AI Integration
+   ↓
+Security
+   ↓
+Dockerization
+   ↓
+GitHub
+   ↓
+Cloud Deployment
+   ↓
+Live Application
+```
+---
+🚀 Future Improvements
+Possible future enhancements include:
+Real-time transportation availability
+More route optimization
+Advanced AI itinerary generation
+Weather integration
+Hotel/accommodation recommendations
+Advanced trip budgeting
+Improved map visualization
+More travel data sources
+Progressive Web App support
+Advanced analytics
+---
+📜 License
+See the `LICENSE` file included in this repository for the applicable license terms.
+---
+👨‍💻 Developer
+Aditya Kumar Gupta
+Project: Trip Analyzer — AI-Powered Travel Planning & Trip Analysis Platform
+GitHub: https://github.com/adityaxrahul/trip-analyzer
+Live: https://trip-analyzer.onrender.com
+---
+⭐ Final Summary
+Trip Analyzer is a full-stack AI-powered travel platform built using ASP.NET Core .NET 10, Entity Framework Core, PostgreSQL, ASP.NET Identity, Google Authentication, Gemini AI, Docker, GitHub, and Render.
+It combines trip analysis, recommendations, routing, fare calculation, geographic data, AI assistance, authentication, user management, responsive design, security, and cloud deployment into one practical application.
 
-## 🧪 Testing Verification Checklist
+🧭 Trip Analyzer
+Plan Smarter. Travel Better.
 
-- [x] **Fresh Session Behavior**: Cookies expire upon closing the browser session; accounts are not automatically cached across sessions.
-- [x] **Password & Google Auth**: Supports standard login, registration, and "Continue with Google" with automatic email linking.
-- [x] **Protected Navigation**: Accessing `/Trip/Analyze` while logged out redirects to `/Account/Login?returnUrl=...` and returns upon authentication.
-- [x] **Admin Authorization**: Non-admin users are denied access to `/Admin` paths; explicitly authorized admins access `/Admin/Dashboard`.
-- [x] **Multi-Viewport Responsiveness**: Tested across 375px, 480px, 768px, 1024px, 1440px, and 1920px with zero horizontal scroll.
+Created by Aditya Kumar Gupta and Team

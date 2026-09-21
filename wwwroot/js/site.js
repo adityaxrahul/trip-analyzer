@@ -105,7 +105,14 @@ function initChatbot() {
     triggerBtn.addEventListener('click', () => {
         windowEl.classList.toggle('hidden');
         if (!windowEl.classList.contains('hidden') && bodyEl.children.length === 0) {
-            fetchChatWelcomeMessage();
+            const isAuthenticated = document.body.dataset.authenticated === 'true';
+            if (isAuthenticated) {
+                fetchChatWelcomeMessage();
+            } else {
+                appendBotMessage({
+                    answer: 'Hello! I am your Trip Assistant. Please sign in to ask questions about routes, fares, and travel intelligence.'
+                });
+            }
         }
     });
 
@@ -133,6 +140,14 @@ function initChatbot() {
         const msg = (customMsg !== undefined ? customMsg : inputEl.value).trim();
         if (!msg || isSending) return;
 
+        // Check authentication before sending
+        const isAuthenticated = document.body.dataset.authenticated === 'true';
+        if (!isAuthenticated) {
+            const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+            window.location.href = `/Account/Login?ReturnUrl=${returnUrl}`;
+            return;
+        }
+
         isSending = true;
         inputEl.value = "";
 
@@ -145,6 +160,12 @@ function initChatbot() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: msg })
             });
+
+            if (res.status === 401) {
+                const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+                window.location.href = `/Account/Login?ReturnUrl=${returnUrl}`;
+                return;
+            }
 
             if (res.ok) {
                 const data = await res.json();

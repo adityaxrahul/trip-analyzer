@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using TripAnalyzer.Services;
@@ -21,8 +22,7 @@ namespace TripAnalyzer.Controllers
             public string? Message { get; set; }
         }
 
-        // Anonymous but rate-limited (S-05): homepage chatbot requires unauthenticated access.
-        // Strict per-IP rate limiting (20 req/min) is enforced via the "chatbot" policy.
+        [Authorize]
         [HttpPost("ask")]
         [EnableRateLimiting("chatbot")]
         public async Task<IActionResult> Ask([FromBody] ChatRequestModel request)
