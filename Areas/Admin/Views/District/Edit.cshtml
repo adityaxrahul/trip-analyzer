@@ -1,0 +1,73 @@
+@model TripAnalyzer.Models.District
+@{
+    ViewData["Title"] = "Edit District";
+    Layout = "_AdminLayout";
+}
+
+<div class="mb-4">
+    <a asp-action="Index" class="text-secondary text-decoration-none small">
+        <i class="bi bi-arrow-left me-1"></i> Back to Districts List
+    </a>
+    <h2 class="fw-bold mt-2" style="color: var(--text-primary);">Edit District</h2>
+    <p class="text-secondary small">Update coordinates and details for the routing engine</p>
+</div>
+
+<div class="glass-panel max-w-2xl">
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Id" />
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="Name" class="form-label-custom">District Name</label>
+                <input asp-for="Name" class="form-control form-control-custom" placeholder="e.g. Rajkot" required />
+                <span asp-validation-for="Name" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="DistrictCode" class="form-label-custom">District LGD Code</label>
+                <input asp-for="DistrictCode" class="form-control form-control-custom" placeholder="e.g. 474" required />
+                <span asp-validation-for="DistrictCode" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="State" class="form-label-custom">State</label>
+                <input asp-for="State" class="form-control form-control-custom" placeholder="e.g. Gujarat" required />
+                <span asp-validation-for="State" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="StateCode" class="form-label-custom">State Code</label>
+                <input asp-for="StateCode" class="form-control form-control-custom" placeholder="e.g. GJ" required />
+                <span asp-validation-for="StateCode" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Latitude" class="form-label-custom">Latitude</label>
+                <input asp-for="Latitude" type="number" step="any" class="form-control form-control-custom" placeholder="e.g. 22.3039" required />
+                <span asp-validation-for="Latitude" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Longitude" class="form-label-custom">Longitude</label>
+                <input asp-for="Longitude" type="number" step="any" class="form-control form-control-custom" placeholder="e.g. 70.8022" required />
+                <span asp-validation-for="Longitude" class="text-danger small"></span>
+            </div>
+
+            <div class="col-12 mt-3">
+                <div class="form-check form-switch">
+                    <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch">
+                    <label class="form-check-label fw-bold small" style="color: var(--text-primary);" asp-for="IsActive">Active and Available for Routing</label>
+                </div>
+            </div>
+
+            <div class="col-12 mt-4 pt-3 border-top border-secondary d-flex gap-2">
+                <button type="submit" class="btn btn-primary-custom" style="background: var(--accent-gradient) !important; box-shadow: 0 4px 18px rgba(255, 122, 61, 0.3) !important;">
+                    Save Changes
+                </button>
+                <a asp-action="Index" class="btn btn-secondary-custom">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>

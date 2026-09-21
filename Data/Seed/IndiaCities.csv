@@ -1,0 +1,48 @@
+CityName,State,StateCode,DistrictCode,CityCode,Latitude,Longitude
+Visakhapatnam,Andhra Pradesh,AP,520,C-AP-520,17.6868,83.2185
+Amaravati,Andhra Pradesh,AP,506,C-AP-506,16.5062,80.648
+Itanagar,Arunachal Pradesh,AR,237,C-AR-237,27.102,93.6166
+Guwahati,Assam,AS,291,C-AS-291,26.1445,91.7362
+Siwan,Bihar,BR,222,C-BR-222,26.2201,84.3566
+Patna,Bihar,BR,212,C-BR-212,25.5941,85.1376
+Raipur,Chhattisgarh,CG,387,C-CG-387,21.2514,81.6296
+Panaji,Goa,GA,551,C-GA-551,15.4909,73.8278
+Margao,Goa,GA,552,C-GA-552,15.2736,73.9582
+Rajkot,Gujarat,GJ,457,C-GJ-457,22.3039,70.8022
+Ahmedabad,Gujarat,GJ,438,C-GJ-438,23.0225,72.5714
+Surat,Gujarat,GJ,459,C-GJ-459,21.1702,72.8311
+Gurugram,Haryana,HR,62,C-HR-62,28.4595,77.0266
+Shimla,Himachal Pradesh,HP,23,C-HP-23,31.1048,77.1734
+Ranchi,Jharkhand,JH,339,C-JH-339,23.3441,85.3096
+Bengaluru,Karnataka,KA,525,C-KA-525,12.9716,77.5946
+Mysore,Karnataka,KA,545,C-KA-545,12.2958,76.6394
+Kochi,Kerala,KL,555,C-KL-555,9.9312,76.2673
+Trivandrum,Kerala,KL,565,C-KL-565,8.5241,76.9366
+Indore,Madhya Pradesh,MP,410,C-MP-410,22.7196,75.8577
+Bhopal,Madhya Pradesh,MP,396,C-MP-396,23.2599,77.4126
+Mumbai,Maharashtra,MH,482,C-MH-482,19.076,72.8777
+Pune,Maharashtra,MH,490,C-MH-490,18.5204,73.8567
+Imphal,Manipur,MN,256,C-MN-256,24.817,93.9368
+Shillong,Meghalaya,ML,274,C-ML-274,25.5788,91.8933
+Aizawl,Mizoram,MZ,261,C-MZ-261,23.7307,92.7173
+Kohima,Nagaland,NL,245,C-NL-245,25.6751,94.1086
+Bhubaneswar,Odisha,OR,362,C-OR-362,20.2961,85.8245
+Amritsar,Punjab,PB,27,C-PB-27,31.634,74.8723
+Jaipur,Rajasthan,RJ,102,C-RJ-102,26.9124,75.7873
+Gangtok,Sikkim,SK,225,C-SK-225,27.3314,88.6138
+Chennai,Tamil Nadu,TN,568,C-TN-568,13.0827,80.2707
+Hyderabad,Telangana,TG,507,C-TG-507,17.385,78.4867
+Agartala,Tripura,TR,272,C-TR-272,23.8315,91.2868
+Lucknow,Uttar Pradesh,UP,162,C-UP-162,26.8467,80.9462
+Gorakhpur,Uttar Pradesh,UP,148,C-UP-148,26.7606,83.3732
+Noida,Uttar Pradesh,UP,144,C-UP-144,28.57,77.32
+Dehradun,Uttarakhand,UK,49,C-UK-49,30.3165,78.0322
+Kolkata,West Bengal,WB,315,C-WB-315,22.5726,88.3639
+Port Blair,Andaman And Nicobar Islands,AN,602,C-AN-602,11.6234,92.7265
+Chandigarh,Chandigarh,CH,44,C-CH-44,30.7333,76.7794
+Kavaratti,Lakshadweep,LD,553,C-LD-553,10.5667,72.637
+Delhi,Delhi,DL,79,C-DL-79,28.6139,77.209
+New Delhi,Delhi,DL,79,C-DL-79,28.6139,77.209
+Puducherry,Puducherry,PY,600,C-PY-600,11.9416,79.8083
+Srinagar,Jammu And Kashmir,JK,13,C-JK-13,34.0837,74.7973
+Leh,Ladakh,LA,9,C-LA-9,34.1526,77.5771

@@ -1,0 +1,62 @@
+@{
+    ViewData["Title"] = "How Recommendation Works";
+}
+
+<div class="container max-w-4xl py-5">
+    <div class="text-center mb-5">
+        <h6 class="text-primary text-uppercase fw-bold">Algorithmic Intelligence</h6>
+        <h1 class="fw-extrabold mb-3">How Recommendation Scoring Works</h1>
+        <p class="text-secondary lead">
+            Trip Analyzer evaluates every available travel mode through a multi-variable normalization engine.
+        </p>
+    </div>
+
+    <div class="glass-panel mb-4">
+        <h4 class="fw-bold mb-3 text-white"><i class="bi bi-sliders text-primary me-2"></i> Scoring Factors & Weights</h4>
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Factor</th>
+                        <th>Weight</th>
+                        <th>Description</th>
+                        <th>Optimization Goal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fw-bold text-white"><i class="bi bi-cash-stack text-success me-2"></i> Cost</td>
+                        <td><span class="badge bg-success">40%</span></td>
+                        <td>Normalized against lowest and highest fares on the route.</td>
+                        <td>Lower total price = Higher score</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold text-white"><i class="bi bi-clock-history text-warning me-2"></i> Travel Duration</td>
+                        <td><span class="badge bg-warning text-dark">30%</span></td>
+                        <td>Total travel time in minutes.</td>
+                        <td>Shorter duration = Higher score</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold text-white"><i class="bi bi-calendar-check text-info me-2"></i> Availability</td>
+                        <td><span class="badge bg-info text-dark">20%</span></td>
+                        <td>Seat availability rate and frequency of departure.</td>
+                        <td>Higher frequency = Higher score</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold text-white"><i class="bi bi-stars text-primary me-2"></i> Comfort & Amenities</td>
+                        <td><span class="badge bg-primary">10%</span></td>
+                        <td>Onboard legroom, AC, Wi-Fi, food service, and smoothness.</td>
+                        <td>Higher rating = Higher score</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="glass-panel">
+        <h4 class="fw-bold mb-3 text-white"><i class="bi bi-info-circle-fill text-info me-2"></i> Transparency Principle</h4>
+        <p class="text-secondary mb-0">
+            We never hide why a transport mode won. Whether a train offers 70% cost savings over a flight or a flight saves 11 hours of travel time, our decision engine clearly explains the rationale in plain language.
+        </p>
+    </div>
+</div>

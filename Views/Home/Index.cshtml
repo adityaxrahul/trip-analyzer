@@ -1,0 +1,609 @@
+@model TripAnalyzer.ViewModels.TripSearchViewModel
+@{
+    ViewData["Title"] = "3D Travel Intelligence";
+}
+
+<!-- Immersive 3D Hero Section -->
+<section class="hero-wrapper text-center d-flex align-items-center justify-content-center" style="position: relative; min-height: 100vh; padding: 6rem 1.25rem 4rem; background: var(--bg-base); overflow: hidden;">
+    <!-- ThreeUI Canvas Iframe -->
+    <iframe id="hero-3d-iframe" 
+            src="/landing-pages/inner-green-3d.html" 
+            style="position: absolute; inset: 0; width: 100%; height: 100%; border: none; z-index: 0; pointer-events: auto; opacity: 0; transition: opacity 0.8s ease;">
+    </iframe>
+    
+    <!-- Dark Vignette Overlay -->
+    <div style="position: absolute; inset: 0; background: radial-gradient(circle at center, transparent 30%, rgba(33, 28, 23, 0.08) 100%); z-index: 1; pointer-events: none;"></div>
+
+    <div class="container max-w-5xl" style="position: relative; z-index: 2; pointer-events: none;" id="hero-overlay-content">
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill mb-4 small fw-bold text-uppercase tracking-widest animate-fade-in" 
+             style="background: var(--chip-teal); border: 1px solid var(--border-default); color: var(--accent-secondary); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); pointer-events: auto; font-size: 0.75rem; letter-spacing: 0.15em;">
+            <i class="bi bi-cpu-fill"></i> Intelligent Travel Decision Engine
+        </div>
+
+        <h1 class="hero-title text-uppercase fw-light tracking-wide animate-fade-up animate-delay-1" 
+            style="font-family: 'Lexend', sans-serif; font-size: clamp(2.8rem, 7vw, 4.5rem); color: var(--text-primary); pointer-events: auto; line-height: 1.15;">
+            PLAN SMARTER.<br/><span class="fw-extrabold" style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">TRAVEL BETTER.</span>
+        </h1>
+        
+        <p class="hero-subtitle max-w-2xl mx-auto animate-fade-up animate-delay-2" 
+            style="font-size: 1.15rem; color: var(--text-muted); margin-top: 1.5rem; margin-bottom: 3rem; pointer-events: auto; font-family: 'Lexend', sans-serif; font-weight: 300; line-height: 1.6;">
+            Compare routes, transport modes, distance and estimated fares to discover the smartest way to travel.
+        </p>
+
+        <div class="d-flex flex-wrap justify-content-center gap-3 animate-fade-up animate-delay-3" style="pointer-events: auto;">
+            <a href="#search-panel-section" class="btn btn-primary-custom px-4 py-3" style="background: var(--accent-gradient) !important; box-shadow: 0 4px 14px rgba(193, 89, 46, 0.25) !important;">
+                <i class="bi bi-compass-fill me-1"></i> ANALYZE YOUR TRIP
+            </a>
+            <a href="#how-it-works-section" class="btn btn-outline-secondary px-4 py-3" style="backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-color: var(--border-default); color: var(--text-primary); background: var(--bg-card);">
+                <i class="bi bi-play-circle me-1"></i> EXPLORE HOW IT WORKS
+            </a>
+        </div>
+    </div>
+
+    <!-- Animated Scroll Indicator -->
+    <div style="position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 2; pointer-events: auto;" class="d-none d-md-block">
+        <a href="#search-panel-section" class="text-decoration-none text-secondary d-flex flex-column align-items-center gap-2 small">
+            <span style="color: var(--text-muted);">SCROLL TO START</span>
+            <div style="width: 20px; height: 35px; border: 2px solid var(--border-default); border-radius: 10px; position: relative;">
+                <div style="width: 4px; height: 8px; background: var(--accent-primary); border-radius: 2px; position: absolute; top: 6px; left: 50%; transform: translateX(-50%); animation: scrollDot 1.5s infinite;"></div>
+            </div>
+        </a>
+    </div>
+</section>
+
+<!-- 3D TRAVEL SEARCH EXPERIENCE -->
+<section id="search-panel-section" class="py-5" style="background: var(--bg-section); position: relative; scroll-margin-top: 4rem;">
+    <!-- Ambient glowing backgrounds -->
+    <div style="position: absolute; top: -10%; left: 10%; width: 350px; height: 350px; background: radial-gradient(circle, rgba(28, 58, 74, 0.05) 0%, transparent 70%); pointer-events: none;"></div>
+    <div style="position: absolute; bottom: 10%; right: 5%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(193, 89, 46, 0.05) 0%, transparent 70%); pointer-events: none;"></div>
+
+    <div class="container max-w-5xl">
+        <div class="text-center mb-5">
+            <span class="badge px-3 py-1.5 rounded-pill mb-2 small text-uppercase tracking-widest" style="background: var(--chip-orange); color: var(--accent-primary); border: 1px solid var(--border-default);"><i class="bi bi-sliders me-1"></i> Command Console</span>
+            <h2 class="fw-bold fs-1" style="color: var(--text-primary);">Configure Your Analysis</h2>
+            <p class="text-secondary max-w-xl mx-auto small">Specify source, destination, and travel passenger volume to compute optimal modes.</p>
+        </div>
+
+        <!-- Glass Command Panel -->
+        <div class="glass-panel search-card max-w-4xl mx-auto" style="border: 1px solid var(--border-default) !important; background: var(--bg-card) !important; backdrop-filter: blur(24px) saturate(1.2); -webkit-backdrop-filter: blur(24px) saturate(1.2); box-shadow: var(--shadow-md), 0 0 30px rgba(193, 89, 46, 0.04);">
+            <form asp-controller="Trip" asp-action="Analyze" method="post">
+                <input type="hidden" id="input-latitude" asp-for="UserLatitude" />
+                <input type="hidden" id="input-longitude" asp-for="UserLongitude" />
+
+                <div class="row g-3 align-items-end" style="position: relative;">
+                    <!-- From Field -->
+                    <div class="col-md-3">
+                        <label class="form-label-custom"><i class="bi bi-geo-alt-fill text-primary me-1"></i> FROM</label>
+                        <input type="text" id="input-source" asp-for="Source" class="form-control form-control-custom" placeholder="e.g. Rajkot" required autocomplete="off" />
+                        <span asp-validation-for="Source" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Swap Button Column -->
+                    <div class="col-md-1 text-center py-2 d-none d-md-block" style="min-width: 45px;">
+                        <button type="button" class="btn btn-outline-secondary rounded-circle border-0 p-2" onclick="swapLocations()" style="background: var(--chip-sand); color: var(--text-primary); transition: transform 0.3s;" id="btn-swap">
+                            <i class="bi bi-arrow-left-right fs-5"></i>
+                        </button>
+                    </div>
+
+                    <!-- To Field -->
+                    <div class="col-md-3">
+                        <label class="form-label-custom"><i class="bi bi-pin-map-fill text-secondary me-1"></i> TO</label>
+                        <input type="text" id="input-destination" asp-for="Destination" class="form-control form-control-custom" placeholder="e.g. Mumbai" required autocomplete="off" />
+                        <span asp-validation-for="Destination" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Date Field -->
+                    <div class="col-md-2">
+                        <label class="form-label-custom"><i class="bi bi-calendar-event-fill me-1" style="color: var(--text-primary);"></i> DATE</label>
+                        <input type="date" asp-for="TravelDate" class="form-control form-control-custom" required />
+                        <span asp-validation-for="TravelDate" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Passengers Field -->
+                    <div class="col-md-1" style="min-width: 90px;">
+                        <label class="form-label-custom"><i class="bi bi-people-fill me-1" style="color: var(--text-primary);"></i> PAX</label>
+                        <select asp-for="Passengers" class="form-select form-control-custom">
+                            @for (int i = 1; i <= 6; i++)
+                            {
+                                <option value="@i">@i</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="col-md-2 flex-grow-1">
+                        <button type="submit" class="btn btn-primary-custom w-100 py-3" style="background: var(--accent-gradient) !important; box-shadow: 0 4px 14px rgba(193, 89, 46, 0.25) !important;">
+                            <i class="bi bi-cpu-fill me-1"></i> ANALYZE
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Swap Button for Mobile Viewports -->
+                <div class="text-center d-md-none my-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1" onclick="swapLocations()">
+                        <i class="bi bi-arrow-down-up me-1"></i> Swap Locations
+                    </button>
+                </div>
+
+                <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 pt-3 border-top" style="border-color: var(--border-default) !important;">
+                    <div class="d-flex gap-2">
+                        <button type="button" id="btn-use-geolocation" class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="border-color: var(--border-default); background: var(--chip-sand); color: var(--text-primary);">
+                            <i class="bi bi-geo-alt-fill text-primary"></i> Use My Current Location
+                        </button>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 small text-muted mt-2 mt-sm-0">
+                        <span>Popular Demo Routes:</span>
+                        <button type="button" class="btn btn-link btn-sm text-secondary p-0 text-decoration-none" onclick="setQuickRoute('Rajkot', 'Mumbai')">Rajkot → Mumbai</button>
+                        <span>•</span>
+                        <button type="button" class="btn btn-link btn-sm text-secondary p-0 text-decoration-none" onclick="setQuickRoute('Rajkot', 'Ahmedabad')">Rajkot → Ahmedabad</button>
+                        <span>•</span>
+                        <button type="button" class="btn btn-link btn-sm text-secondary p-0 text-decoration-none" onclick="setQuickRoute('Ahmedabad', 'Delhi')">Ahmedabad → Delhi</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- TRAVEL INTELLIGENCE STATS -->
+<section class="py-5" style="background: var(--bg-base); border-top: 1px solid var(--border-default); border-bottom: 1px solid var(--border-default);">
+    <div class="container max-w-6xl text-center">
+        <div class="row g-4" id="stats-row">
+            <div class="col-6 col-md-3">
+                <div class="glass-panel p-4" style="background: var(--bg-card) !important; border: 1px solid var(--border-default);">
+                    <div class="p-3 rounded-circle w-max mx-auto mb-3" style="background: var(--chip-orange); color: var(--accent-primary);">
+                        <i class="bi bi-map-fill fs-4"></i>
+                    </div>
+                    <h2 class="fw-extrabold mb-1" style="color: var(--text-primary);"><span class="count-number" data-target="@ViewBag.TotalTripsCount">0</span>+</h2>
+                    <span class="text-secondary small uppercase tracking-wider fw-semibold">Journeys Analyzed</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="glass-panel p-4" style="background: var(--bg-card) !important; border: 1px solid var(--border-default);">
+                    <div class="p-3 rounded-circle w-max mx-auto mb-3" style="background: var(--chip-teal); color: var(--accent-secondary);">
+                        <i class="bi bi-bus-front-fill fs-4"></i>
+                    </div>
+                    <h2 class="fw-extrabold mb-1" style="color: var(--text-primary);"><span class="count-number" data-target="4">0</span> Modes</h2>
+                    <span class="text-secondary small uppercase tracking-wider fw-semibold">Train • Bus • Flight • Car</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="glass-panel p-4" style="background: var(--bg-card) !important; border: 1px solid var(--border-default);">
+                    <div class="p-3 rounded-circle w-max mx-auto mb-3" style="background: var(--chip-sand); color: var(--text-muted);">
+                        <i class="bi bi-geo-alt-fill fs-4"></i>
+                    </div>
+                    <h2 class="fw-extrabold mb-1" style="color: var(--text-primary);"><span class="count-number" data-target="@ViewBag.TotalDestinationsCount">0</span> Nodes</h2>
+                    <span class="text-secondary small uppercase tracking-wider fw-semibold">Destinations Configured</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="glass-panel p-4" style="background: var(--bg-card) !important; border: 1px solid var(--border-default);">
+                    <div class="p-3 rounded-circle w-max mx-auto mb-3" style="background: var(--chip-amber); color: var(--accent-warning);">
+                        <i class="bi bi-patch-check-fill fs-4"></i>
+                    </div>
+                    <h2 class="fw-extrabold mb-1" style="color: var(--text-primary);"><span class="count-number" data-target="98">0</span>.4%</h2>
+                    <span class="text-secondary small uppercase tracking-wider fw-semibold">Recommendation Score</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- WHY TRIP ANALYZER -->
+<section class="py-5" style="background: var(--bg-section); position: relative;">
+    <div class="container max-w-6xl">
+        <div class="text-center mb-5">
+            <span class="badge px-3 py-1.5 rounded-pill mb-2 small text-uppercase tracking-widest" style="background: var(--chip-orange); color: var(--accent-primary); border: 1px solid var(--border-default);"><i class="bi bi-patch-question me-1"></i> Core Advantage</span>
+            <h2 class="fw-bold" style="color: var(--text-primary);">Why Trip Analyzer</h2>
+            <p class="text-secondary max-w-2xl mx-auto small">
+                Unlike normal ticketing queries that only return static lists, Trip Analyzer combines travel factors into a single transparent recommendation score.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="glass-panel h-100 glow-card" style="transition: all 0.3s; transform-style: preserve-3d;">
+                    <div class="p-3 rounded-circle w-max mb-3" style="background: var(--chip-orange); color: var(--accent-primary);">
+                        <i class="bi bi-shuffle fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2" style="color: var(--text-primary);">SMART COMPARISON</h5>
+                    <p class="text-secondary small mb-0">
+                        Evaluates Train, Bus, Flight, and Car options simultaneously on cost, comfort, and duration.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass-panel h-100 glow-card" style="transition: all 0.3s; transform-style: preserve-3d;">
+                    <div class="p-3 rounded-circle w-max mb-3" style="background: var(--chip-teal); color: var(--accent-secondary);">
+                        <i class="bi bi-activity fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2" style="color: var(--text-primary);">INTELLIGENT SCORING</h5>
+                    <p class="text-secondary small mb-0">
+                        Proprietary normalization combining Cost (40%), Duration (30%), Availability (20%), and Onboard Comfort (10%).
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass-panel h-100 glow-card" style="transition: all 0.3s; transform-style: preserve-3d;">
+                    <div class="p-3 rounded-circle w-max mb-3" style="background: var(--chip-sand); color: var(--text-muted);">
+                        <i class="bi bi-globe fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2" style="color: var(--text-primary);">GLOBAL LOCATIONS</h5>
+                    <p class="text-secondary small mb-0">
+                        Scans districts, cities, and countries across both local LGD indices and international hubs.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass-panel h-100 glow-card" style="transition: all 0.3s; transform-style: preserve-3d;">
+                    <div class="p-3 rounded-circle w-max mb-3" style="background: var(--chip-amber); color: var(--accent-warning);">
+                        <i class="bi bi-file-earmark-check fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2" style="color: var(--text-primary);">TRANSPARENT ESTIMATES</h5>
+                    <p class="text-secondary small mb-0">
+                        Clearly highlights estimated benchmark values from real-time dynamic configurations.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS TIMELINE -->
+<section id="how-it-works-section" class="py-5" style="background: var(--bg-base); position: relative;">
+    <div class="container max-w-5xl">
+        <div class="text-center mb-5">
+            <span class="badge px-3 py-1.5 rounded-pill mb-2 small text-uppercase tracking-widest" style="background: var(--chip-orange); color: var(--accent-primary); border: 1px solid var(--border-default);"><i class="bi bi-clock me-1"></i> Workflow Path</span>
+            <h2 class="fw-bold" style="color: var(--text-primary);">How It Works</h2>
+        </div>
+
+        <div class="timeline-container" style="position: relative; padding: 2rem 0;">
+            <!-- Connector vertical line -->
+            <div style="position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: var(--border-default); transform: translateX(-50%);" class="d-none d-md-block"></div>
+
+            <!-- Timeline Step 1 -->
+            <div class="row align-items-center mb-5 show-on-scroll">
+                <div class="col-md-5 text-md-end">
+                    <div class="glass-panel p-4" style="background: var(--bg-card) !important;">
+                        <h4 class="fw-bold" style="color: var(--text-primary);">01. Choose Route</h4>
+                        <p class="text-secondary small mb-0">Specify your locations using our autocomplete dataset representing Indian districts and international centers.</p>
+                    </div>
+                </div>
+                <div class="col-md-2 text-center d-none d-md-block" style="z-index: 2;">
+                    <div class="p-3 rounded-circle" style="width: 50px; height: 50px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-primary); color: #fff; box-shadow: 0 0 12px rgba(193, 89, 46, 0.3);">1</div>
+                </div>
+                <div class="col-md-5"></div>
+            </div>
+
+            <!-- Timeline Step 2 -->
+            <div class="row align-items-center mb-5 show-on-scroll">
+                <div class="col-md-5 order-md-2">
+                    <div class="glass-panel p-4" style="background: var(--bg-card) !important;">
+                        <h4 class="fw-bold" style="color: var(--text-primary);">02. Analyze Travel Options</h4>
+                        <p class="text-secondary small mb-0">Our engine evaluates active database carriers, mapping available straight-line paths and transit rates.</p>
+                    </div>
+                </div>
+                <div class="col-md-2 text-center order-md-1 d-none d-md-block" style="z-index: 2;">
+                    <div class="p-3 rounded-circle" style="width: 50px; height: 50px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-secondary); color: #fff; box-shadow: 0 0 12px rgba(28, 58, 74, 0.3);">2</div>
+                </div>
+                <div class="col-md-5 order-md-1"></div>
+            </div>
+
+            <!-- Timeline Step 3 -->
+            <div class="row align-items-center mb-5 show-on-scroll">
+                <div class="col-md-5 text-md-end">
+                    <div class="glass-panel p-4" style="background: var(--bg-card) !important;">
+                        <h4 class="fw-bold" style="color: var(--text-primary);">03. Compare Cost &amp; Duration</h4>
+                        <p class="text-secondary small mb-0">Values are automatically weighted against comfort configurations and seat parameters.</p>
+                    </div>
+                </div>
+                <div class="col-md-2 text-center d-none d-md-block" style="z-index: 2;">
+                    <div class="p-3 rounded-circle" style="width: 50px; height: 50px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-primary); color: #fff; box-shadow: 0 0 12px rgba(193, 89, 46, 0.3);">3</div>
+                </div>
+                <div class="col-md-5"></div>
+            </div>
+
+            <!-- Timeline Step 4 -->
+            <div class="row align-items-center mb-5 show-on-scroll">
+                <div class="col-md-5 order-md-2">
+                    <div class="glass-panel p-4" style="background: var(--bg-card) !important;">
+                        <h4 class="fw-bold" style="color: var(--text-primary);">04. Get Recommendation</h4>
+                        <p class="text-secondary small mb-0">Review the transparent reasoning explaining which mode fits your travel constraints.</p>
+                    </div>
+                </div>
+                <div class="col-md-2 text-center order-md-1 d-none d-md-block" style="z-index: 2;">
+                    <div class="p-3 rounded-circle" style="width: 50px; height: 50px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-secondary); color: #fff; box-shadow: 0 0 12px rgba(28, 58, 74, 0.3);">4</div>
+                </div>
+                <div class="col-md-5 order-md-1"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TRANSPORT VISUALIZATION -->
+<section class="py-5" style="background: var(--bg-section);">
+    <div class="container max-w-6xl">
+        <div class="text-center mb-5">
+            <span class="badge px-3 py-1.5 rounded-pill mb-2 small text-uppercase tracking-widest" style="background: var(--chip-orange); color: var(--accent-primary); border: 1px solid var(--border-default);"><i class="bi bi-airplane-engines me-1"></i> Mode Matrix</span>
+            <h2 class="fw-bold" style="color: var(--text-primary);">Supported Transport Systems</h2>
+        </div>
+
+        <div class="row g-4">
+            <!-- Train Card -->
+            <div class="col-md-3">
+                <div class="glass-panel text-center p-4 glow-card h-100" style="transition: all 0.3s;">
+                    <div class="fs-1 mb-3" style="color: var(--accent-primary);"><i class="bi bi-train-front"></i></div>
+                    <h5 class="fw-bold" style="color: var(--text-primary);">TRAIN</h5>
+                    <p class="text-secondary small mb-0">High availability and eco-friendly transits. Optimal for overnight domestic travel.</p>
+                    <div class="mt-3 text-secondary small pt-2 border-top" style="border-color: var(--border-default) !important;">Avg. Comfort: 85%</div>
+                </div>
+            </div>
+            <!-- Bus Card -->
+            <div class="col-md-3">
+                <div class="glass-panel text-center p-4 glow-card h-100" style="transition: all 0.3s;">
+                    <div class="fs-1 mb-3" style="color: var(--accent-secondary);"><i class="bi bi-bus-front"></i></div>
+                    <h5 class="fw-bold" style="color: var(--text-primary);">BUS</h5>
+                    <p class="text-secondary small mb-0">Flexible schedules, budget-friendly fares, and connecting regional routes.</p>
+                    <div class="mt-3 text-secondary small pt-2 border-top" style="border-color: var(--border-default) !important;">Avg. Comfort: 72%</div>
+                </div>
+            </div>
+            <!-- Flight Card -->
+            <div class="col-md-3">
+                <div class="glass-panel text-center p-4 glow-card h-100" style="transition: all 0.3s;">
+                    <div class="fs-1 mb-3" style="color: var(--accent-info);"><i class="bi bi-airplane"></i></div>
+                    <h5 class="fw-bold" style="color: var(--text-primary);">FLIGHT</h5>
+                    <p class="text-secondary small mb-0">Unmatched speed for long distances. High comfort scores with fast transit hours.</p>
+                    <div class="mt-3 text-secondary small pt-2 border-top" style="border-color: var(--border-default) !important;">Avg. Comfort: 92%</div>
+                </div>
+            </div>
+            <!-- Car Card -->
+            <div class="col-md-3">
+                <div class="glass-panel text-center p-4 glow-card h-100" style="transition: all 0.3s;">
+                    <div class="fs-1 mb-3" style="color: var(--accent-success);"><i class="bi bi-car-front"></i></div>
+                    <h5 class="fw-bold" style="color: var(--text-primary);">CAR</h5>
+                    <p class="text-secondary small mb-0">Doorstep pickups and complete timing flexibility. Ideal for custom pitstops.</p>
+                    <div class="mt-3 text-secondary small pt-2 border-top" style="border-color: var(--border-default) !important;">Avg. Comfort: 80%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SMART RECOMMENDATION SHOWCASE -->
+<section class="py-5" style="background: var(--bg-base); position: relative;">
+    <div class="container max-w-6xl">
+        <div class="text-center mb-5">
+            <span class="badge px-3 py-1.5 rounded-pill mb-2 small text-uppercase tracking-widest" style="background: var(--chip-orange); color: var(--accent-primary); border: 1px solid var(--border-default);"><i class="bi bi-trophy me-1"></i> Recommendation Sandbox</span>
+            <h2 class="fw-bold" style="color: var(--text-primary);">Decisions In Action</h2>
+            <p class="text-secondary max-w-2xl mx-auto small">See how our algorithm compares parameters on a sample route (Rajkot to Mumbai) using actual database seeds.</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Best Overall -->
+            <div class="col-md-6 col-lg-3">
+                <div class="glass-panel p-4 h-100" style="border: 1px solid rgba(62, 122, 86, 0.3) !important; background: var(--bg-card) !important;">
+                    <span class="badge mb-3" style="background: var(--accent-success); color: #fff;">BEST OVERALL</span>
+                    <h4 class="fw-bold" style="color: var(--text-primary);">TRAIN</h4>
+                    <div class="small text-secondary mb-1">Estimated Fare: <span class="fw-bold" style="color: var(--accent-success);">₹800</span></div>
+                    <div class="small text-secondary mb-1">Estimated Duration: <strong>12h 00m</strong></div>
+                    <div class="small text-secondary mb-3">Approximate Distance: <strong>700 km</strong></div>
+                    <div class="score-badge mt-2 w-max">
+                        <span class="score-value" style="color: var(--accent-success);">84</span>
+                        <span class="score-label text-secondary">SCORE</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Cheapest -->
+            <div class="col-md-6 col-lg-3">
+                <div class="glass-panel p-4 h-100" style="border: 1px solid rgba(28, 58, 74, 0.3) !important; background: var(--bg-card) !important;">
+                    <span class="badge mb-3" style="background: var(--accent-secondary); color: #fff;">CHEAPEST CHOICE</span>
+                    <h4 class="fw-bold" style="color: var(--text-primary);">TRAIN</h4>
+                    <div class="small text-secondary mb-1">Estimated Fare: <span class="fw-bold" style="color: var(--accent-success);">₹800</span></div>
+                    <div class="small text-secondary mb-1">Estimated Duration: <strong>12h 00m</strong></div>
+                    <div class="small text-secondary mb-3">Approximate Distance: <strong>700 km</strong></div>
+                    <div class="score-badge mt-2 w-max">
+                        <span class="score-value" style="color: var(--accent-secondary);">84</span>
+                        <span class="score-label text-secondary">SCORE</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Fastest -->
+            <div class="col-md-6 col-lg-3">
+                <div class="glass-panel p-4 h-100" style="border: 1px solid rgba(181, 121, 42, 0.3) !important; background: var(--bg-card) !important;">
+                    <span class="badge mb-3" style="background: var(--accent-warning); color: #fff;">FASTEST</span>
+                    <h4 class="fw-bold" style="color: var(--text-primary);">FLIGHT</h4>
+                    <div class="small text-secondary mb-1">Estimated Fare: <span class="fw-bold" style="color: var(--accent-success);">₹4,500</span></div>
+                    <div class="small text-secondary mb-1">Estimated Duration: <strong>1h 30m</strong></div>
+                    <div class="small text-secondary mb-3">Approximate Distance: <strong>700 km</strong></div>
+                    <div class="score-badge mt-2 w-max">
+                        <span class="score-value" style="color: var(--accent-warning);">78</span>
+                        <span class="score-label text-secondary">SCORE</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Most Convenient -->
+            <div class="col-md-6 col-lg-3">
+                <div class="glass-panel p-4 h-100" style="border: 1px solid rgba(193, 89, 46, 0.3) !important; background: var(--bg-card) !important;">
+                    <span class="badge mb-3" style="background: var(--accent-primary); color: #fff;">MOST CONVENIENT</span>
+                    <h4 class="fw-bold" style="color: var(--text-primary);">FLIGHT</h4>
+                    <div class="small text-secondary mb-1">Estimated Fare: <span class="fw-bold" style="color: var(--accent-success);">₹4,500</span></div>
+                    <div class="small text-secondary mb-1">Estimated Duration: <strong>1h 30m</strong></div>
+                    <div class="small text-secondary mb-3">Approximate Distance: <strong>700 km</strong></div>
+                    <div class="score-badge mt-2 w-max">
+                        <span class="score-value" style="color: var(--accent-primary);">78</span>
+                        <span class="score-label text-secondary">SCORE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 p-3 rounded text-center border" style="background: var(--bg-card); border-color: var(--border-default) !important;">
+            <i class="bi bi-info-circle-fill text-info me-2"></i>
+            <span class="text-secondary small fw-bold uppercase">ESTIMATED DATA - NOT LIVE BOOKING DATA</span>
+        </div>
+    </div>
+</section>
+
+<!-- ROUTE VISUALIZER -->
+<section class="py-5" style="background: var(--bg-section); position: relative; overflow: hidden;">
+    <div class="container max-w-4xl text-center">
+        <div class="mb-4">
+            <span class="badge px-3 py-1.5 rounded-pill mb-2 small text-uppercase tracking-widest" style="background: var(--chip-orange); color: var(--accent-primary); border: 1px solid var(--border-default);"><i class="bi bi-diagram-3-fill me-1"></i> Transit Visualization</span>
+            <h2 class="fw-bold" style="color: var(--text-primary);">Route Visualizer</h2>
+            <p class="text-secondary small">Real path networks computed by the system coordinates</p>
+        </div>
+
+        <div class="glass-panel p-4 d-flex flex-column flex-md-row justify-content-center align-items-center gap-4 max-w-2xl mx-auto" style="position: relative; background: var(--bg-card) !important;">
+            <!-- Node 1 -->
+            <div class="d-flex flex-column align-items-center">
+                <div class="p-3 rounded-circle text-white fw-bold mb-2 shadow-neon" style="width: 60px; height: 60px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-primary);">RJ</div>
+                <div class="fw-bold small" style="color: var(--text-primary);">Rajkot</div>
+            </div>
+            
+            <!-- Animated Route 1 -->
+            <div class="flex-grow-1 d-none d-md-flex align-items-center" style="min-width: 100px; position: relative;">
+                <div style="width: 100%; height: 2px; background: var(--border-default); position: relative;">
+                    <div style="position: absolute; width: 8px; height: 8px; background: var(--accent-primary); border-radius: 50%; top: -3px; animation: routeDot 2s linear infinite;"></div>
+                </div>
+            </div>
+            
+            <!-- Node 2 -->
+            <div class="d-flex flex-column align-items-center">
+                <div class="p-3 rounded-circle text-white fw-bold mb-2" style="width: 60px; height: 60px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-secondary);">AH</div>
+                <div class="fw-bold small" style="color: var(--text-primary);">Ahmedabad</div>
+            </div>
+
+            <!-- Animated Route 2 -->
+            <div class="flex-grow-1 d-none d-md-flex align-items-center" style="min-width: 100px; position: relative;">
+                <div style="width: 100%; height: 2px; background: var(--border-default); position: relative;">
+                    <div style="position: absolute; width: 8px; height: 8px; background: var(--accent-primary); border-radius: 50%; top: -3px; animation: routeDot 2s linear infinite; animation-delay: 1s;"></div>
+                </div>
+            </div>
+
+            <!-- Node 3 -->
+            <div class="d-flex flex-column align-items-center">
+                <div class="p-3 rounded-circle fw-bold mb-2" style="width: 60px; height: 60px; display: inline-flex; align-items: center; justify-content: center; background: var(--bg-card); border: 2px solid var(--border-default); color: var(--text-primary);">MU</div>
+                <div class="fw-bold small" style="color: var(--text-primary);">Mumbai</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- GLOBAL EXPLORER -->
+<section class="py-5" style="background: var(--bg-base); position: relative;">
+    <div class="container max-w-6xl">
+        <div class="text-center mb-5">
+            <span class="badge px-3 py-1.5 rounded-pill mb-2 small text-uppercase tracking-widest" style="background: var(--chip-orange); color: var(--accent-primary); border: 1px solid var(--border-default);"><i class="bi bi-globe2 me-1"></i> Geographic Coverage</span>
+            <h2 class="fw-bold" style="color: var(--text-primary);">Global Explorer</h2>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-6 col-md-4 col-lg-2 flex-grow-1">
+                <div class="glass-panel text-center p-3 glow-card" style="transition: all 0.2s; background: var(--bg-card); border: 1px solid var(--border-default);">
+                    <h5 class="fw-bold mb-1" style="color: var(--text-primary);">India</h5>
+                    <span class="text-secondary small">LGD Districts &amp; Cities</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2 flex-grow-1">
+                <div class="glass-panel text-center p-3 glow-card" style="transition: all 0.2s; background: var(--bg-card); border: 1px solid var(--border-default);">
+                    <h5 class="fw-bold mb-1" style="color: var(--text-primary);">Asia</h5>
+                    <span class="text-secondary small">International Hubs</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2 flex-grow-1">
+                <div class="glass-panel text-center p-3 glow-card" style="transition: all 0.2s; background: var(--bg-card); border: 1px solid var(--border-default);">
+                    <h5 class="fw-bold mb-1" style="color: var(--text-primary);">Europe</h5>
+                    <span class="text-secondary small">Transit Corridors</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2 flex-grow-1">
+                <div class="glass-panel text-center p-3 glow-card" style="transition: all 0.2s; background: var(--bg-card); border: 1px solid var(--border-default);">
+                    <h5 class="fw-bold mb-1" style="color: var(--text-primary);">North America</h5>
+                    <span class="text-secondary small">Metropolitan Cities</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2 flex-grow-1">
+                <div class="glass-panel text-center p-3 glow-card" style="transition: all 0.2s; background: var(--bg-card); border: 1px solid var(--border-default);">
+                    <h5 class="fw-bold mb-1" style="color: var(--text-primary);">Middle East</h5>
+                    <span class="text-secondary small">Seeded Coordinates</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ / ASSISTANCE SECTION -->
+<section class="py-5" style="background: var(--bg-section); position: relative;">
+    <div class="container max-w-4xl">
+        <div class="text-center mb-5">
+            <span class="badge px-3 py-1.5 rounded-pill mb-2 small text-uppercase tracking-widest" style="background: var(--chip-orange); color: var(--accent-primary); border: 1px solid var(--border-default);"><i class="bi bi-question-circle me-1"></i> FAQ Hub</span>
+            <h2 class="fw-bold" style="color: var(--text-primary);">Frequently Asked Questions</h2>
+        </div>
+
+        <div class="accordion accordion-custom" id="faqAccordion">
+            <div class="accordion-item mb-2" style="background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-sm);">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" style="background: transparent; color: var(--text-primary); box-shadow: none;">
+                        How does Trip Analyzer work?
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body text-secondary small">
+                        Trip Analyzer evaluates Train, Bus, Flight, and Driving options for your journey. It calculates a Recommendation Score (0-100) combining Cost (40%), Duration (30%), Availability (20%), and Onboard Comfort (10%) to find your optimal travel mode.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item mb-2" style="background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-sm);">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" style="background: transparent; color: var(--text-primary); box-shadow: none;">
+                        How is fare calculated?
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body text-secondary small">
+                        Fare rates are calculated based on the base fare, the rate per kilometer, and the minimum fare settings of each transportation mode stored in our Fare configurations database.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item mb-2" style="background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-sm);">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" style="background: transparent; color: var(--text-primary); box-shadow: none;">
+                        How is distance calculated?
+                    </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body text-secondary small">
+                        Distance is computed as the approximate straight-line (Great-Circle) distance between locations using mathematical latitude and longitude coordinates derived from the LGD India dataset or worldwide hubs.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item mb-2" style="background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-sm);">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" style="background: transparent; color: var(--text-primary); box-shadow: none;">
+                        Is the ticket data live?
+                    </button>
+                </h2>
+                <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body text-secondary small">
+                        Options labeled "Estimated Data" reflect benchmark sample fares and schedules. Trip Analyzer is designed to integrate live APIs (such as IRCTC, Amadeus, or RedBus) as official keys are connected.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FINAL CINEMATIC CTA -->
+<section class="py-5 text-center" style="background: linear-gradient(180deg, var(--bg-section) 0%, var(--bg-base) 100%); position: relative; border-top: 1px solid var(--border-default);">
+    <div class="container max-w-4xl py-5">
+        <h2 class="display-5 fw-bold mb-3" style="color: var(--text-primary);">READY TO TRAVEL SMARTER?</h2>
+        <p class="text-secondary max-w-md mx-auto mb-4 small">Analyze your next journey with Trip Analyzer. Get transparent fares and routes immediately.</p>
+        <a href="#search-panel-section" class="btn btn-primary-custom px-5 py-3" style="background: var(--accent-gradient) !important; box-shadow: 0 4px 18px rgba(193, 89, 46, 0.25) !important;">
+            ANALYZE YOUR TRIP
+        </a>
+    </div>
+</section>

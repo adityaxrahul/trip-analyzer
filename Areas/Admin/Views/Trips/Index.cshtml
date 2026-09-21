@@ -1,0 +1,67 @@
+@model List<TripAnalyzer.Models.Trip>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Global Trip Analysis Logs";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold mb-0" style="color: var(--text-primary);">System Trips Log (@Model.Count)</h3>
+</div>
+
+<div class="admin-stat-card mb-4">
+    <form method="get" class="row g-2">
+        <div class="col-md-8">
+            <input type="text" name="search" value="@ViewBag.SearchTerm" class="form-control form-control-custom" placeholder="Search by source, destination, or user name..." />
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+            <button type="submit" class="btn btn-primary-custom w-100">Search</button>
+            <a asp-action="Index" class="btn btn-secondary-custom">Reset</a>
+        </div>
+    </form>
+</div>
+
+<div class="admin-stat-card">
+    <div class="table-responsive">
+        <table class="table table-custom align-middle">
+            <thead>
+                <tr>
+                    <th>Trip ID</th>
+                    <th>Route</th>
+                    <th>User</th>
+                    <th>Travel Date</th>
+                    <th>Pax</th>
+                    <th>Recommended Mode</th>
+                    <th>Analyzed At</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var t in Model)
+                {
+                    var rec = t.Analyses?.FirstOrDefault(a => a.IsRecommended);
+                    <tr>
+                        <td class="fw-bold text-muted">#@t.Id</td>
+                        <td class="fw-bold" style="color: var(--text-primary);">@t.Source → @t.Destination (@t.DistanceKm.ToString("N0") km)</td>
+                        <td>@(t.User?.FullName ?? "Guest User")</td>
+                        <td>@t.TravelDate.ToString("MMM dd, yyyy")</td>
+                        <td>@t.Passengers</td>
+                        <td>
+                            @if (rec != null)
+                            {
+                                <span class="badge bg-success">@rec.TransportOption?.Mode (Score @rec.OverallScore)</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Evaluated</span>
+                            }
+                        </td>
+                        <td>@t.CreatedAt.ToString("MMM dd HH:mm")</td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@t.Id" class="btn btn-sm btn-secondary-custom">Inspect</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

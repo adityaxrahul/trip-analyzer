@@ -1,0 +1,94 @@
+@model List<TripAnalyzer.Models.TransportOption>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Transport Routes & Carrier Management";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold mb-0" style="color: var(--text-primary);">Transport Options (@Model.Count)</h3>
+    <a asp-action="Create" class="btn btn-primary-custom">
+        <i class="bi bi-plus-lg me-1"></i> Add Transport Option
+    </a>
+</div>
+
+<div class="admin-stat-card mb-4">
+    <form method="get" class="row g-2">
+        <div class="col-md-4">
+            <select name="mode" class="form-select form-control-custom">
+                <option value="">All Modes (Train, Bus, Flight, Car)</option>
+                <option value="Train" selected="@(ViewBag.SelectedMode == "Train")">Train</option>
+                <option value="Bus" selected="@(ViewBag.SelectedMode == "Bus")">Bus</option>
+                <option value="Flight" selected="@(ViewBag.SelectedMode == "Flight")">Flight</option>
+                <option value="Car" selected="@(ViewBag.SelectedMode == "Car")">Car</option>
+            </select>
+        </div>
+        <div class="col-md-5">
+            <input type="text" name="search" value="@ViewBag.SearchTerm" class="form-control form-control-custom" placeholder="Search by source, destination, or carrier..." />
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary-custom w-100">Filter</button>
+            <a asp-action="Index" class="btn btn-secondary-custom">Reset</a>
+        </div>
+    </form>
+</div>
+
+<div class="admin-stat-card">
+    <div class="table-responsive">
+        <table class="table table-custom align-middle">
+            <thead>
+                <tr>
+                    <th>Route</th>
+                    <th>Mode &amp; Carrier</th>
+                    <th>Base Fare</th>
+                    <th>Duration</th>
+                    <th>Scores (Avail / Comfort)</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var t in Model)
+                {
+                    int hrs = t.DurationMinutes / 60;
+                    int mins = t.DurationMinutes % 60;
+
+                    <tr>
+                        <td class="fw-bold" style="color: var(--text-primary);">@t.Source → @t.Destination</td>
+                        <td>
+                            <span class="badge bg-secondary me-1">@t.Mode</span>
+                            <span class="small" style="color: var(--text-muted);">@t.CarrierName</span>
+                        </td>
+                        <td class="fw-bold text-success">₹@t.BasePricePerPassenger.ToString("N0")</td>
+                        <td>@(hrs > 0 ? $"{hrs}h " : "")@($"{mins}m") (@t.DistanceKm km)</td>
+                        <td>
+                            <span class="text-info small">@t.AvailabilityScore / 100</span> |
+                            <span class="text-warning small">@t.ComfortScore / 100</span>
+                        </td>
+                        <td>
+                            <span class="badge @(t.IsActive ? "bg-success" : "bg-danger")">
+                                @(t.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a asp-action="Edit" asp-route-id="@t.Id" class="btn btn-sm btn-secondary-custom">Edit</a>
+                                <form asp-action="ToggleActive" method="post">
+                                    <input type="hidden" name="id" value="@t.Id" />
+                                    <button type="submit" class="btn btn-sm @(t.IsActive ? "btn-outline-warning" : "btn-outline-success")">
+                                        @(t.IsActive ? "Disable" : "Enable")
+                                    </button>
+                                </form>
+                                <form asp-action="Delete" method="post" onsubmit="return confirm('Delete this transport option?');">
+                                    <input type="hidden" name="id" value="@t.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

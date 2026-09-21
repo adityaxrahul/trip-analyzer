@@ -1,0 +1,67 @@
+@model TripAnalyzer.Models.FareConfiguration
+@{
+    ViewData["Title"] = "Edit Fare Configuration";
+    Layout = "_AdminLayout";
+}
+
+<div class="mb-4">
+    <a asp-action="Index" class="text-secondary text-decoration-none small">
+        <i class="bi bi-arrow-left me-1"></i> Back to Fares List
+    </a>
+    <h2 class="fw-bold mt-2" style="color: var(--text-primary);">Edit Fare Configuration</h2>
+    <p class="text-secondary small">Update base pricing and rates per kilometer</p>
+</div>
+
+<div class="glass-panel max-w-2xl">
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Id" />
+        
+        <div class="row g-3">
+            <div class="col-md-12">
+                <label asp-for="Mode" class="form-label-custom">Travel Mode</label>
+                <select asp-for="Mode" class="form-select form-control-custom" required>
+                    <option value="">-- Select Mode --</option>
+                    <option value="Train">Train</option>
+                    <option value="Bus">Bus</option>
+                    <option value="Flight">Flight</option>
+                    <option value="Car">Car</option>
+                </select>
+                <span asp-validation-for="Mode" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="BaseFare" class="form-label-custom">Base Price (₹)</label>
+                <input asp-for="BaseFare" type="number" step="0.01" class="form-control form-control-custom" placeholder="e.g. 150.00" required />
+                <span asp-validation-for="BaseFare" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="PerKmRate" class="form-label-custom">Rate Per Km (₹)</label>
+                <input asp-for="PerKmRate" type="number" step="0.01" class="form-control form-control-custom" placeholder="e.g. 2.50" required />
+                <span asp-validation-for="PerKmRate" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="MinimumFare" class="form-label-custom">Minimum Fare (₹)</label>
+                <input asp-for="MinimumFare" type="number" step="0.01" class="form-control form-control-custom" placeholder="e.g. 50.00" required />
+                <span asp-validation-for="MinimumFare" class="text-danger small"></span>
+            </div>
+
+            <div class="col-12 mt-3">
+                <div class="form-check form-switch">
+                    <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch">
+                    <label class="form-check-label fw-bold small" style="color: var(--text-primary);" asp-for="IsActive">Active and Available for Calculations</label>
+                </div>
+            </div>
+
+            <div class="col-12 mt-4 pt-3 border-top border-secondary d-flex gap-2">
+                <button type="submit" class="btn btn-primary-custom" style="background: var(--accent-gradient) !important; box-shadow: 0 4px 18px rgba(255, 122, 61, 0.3) !important;">
+                    Save Changes
+                </button>
+                <a asp-action="Index" class="btn btn-secondary-custom">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>

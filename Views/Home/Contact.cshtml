@@ -1,0 +1,77 @@
+@model TripAnalyzer.ViewModels.ContactViewModel
+@{
+    ViewData["Title"] = "Contact Support";
+}
+
+<div class="container max-w-3xl py-5">
+    <div class="text-center mb-4">
+        <h6 class="text-primary text-uppercase fw-bold">Support &amp; Feedback</h6>
+        <h1 class="fw-extrabold mb-2">Get in Touch</h1>
+        <p class="text-secondary">Have questions or feedback? Send us a message and our team will get back to you.</p>
+    </div>
+
+    @if (Model.IsSubmitted)
+    {
+        <div class="glass-panel text-center py-5">
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div class="p-3 rounded-circle bg-warning-subtle text-warning w-max mx-auto mb-3" style="width: fit-content;">
+                    <i class="bi bi-exclamation-triangle-fill fs-1"></i>
+                </div>
+                <h3 class="fw-bold text-white mb-2">Enquiry Saved with SMTP Warning</h3>
+                <p class="text-secondary max-w-md mx-auto mb-4">
+                    @ViewBag.ErrorMessage
+                </p>
+            }
+            else
+            {
+                <div class="p-3 rounded-circle bg-success-subtle text-success w-max mx-auto mb-3" style="width: fit-content;">
+                    <i class="bi bi-check-lg fs-1"></i>
+                </div>
+                <h3 class="fw-bold text-white mb-2">Enquiry Submitted!</h3>
+                <p class="text-secondary max-w-md mx-auto mb-4">
+                    Thank you for contacting Trip Analyzer. We have received your inquiry and sent a confirmation alert to our support team.
+                </p>
+            }
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary-custom px-4">Return Home</a>
+        </div>
+    }
+    else
+    {
+        <div class="glass-panel">
+            <form asp-action="Contact" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="Name" class="form-label-custom"></label>
+                        <input asp-for="Name" class="form-control form-control-custom" placeholder="John Doe" required />
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label-custom"></label>
+                        <input asp-for="Email" class="form-control form-control-custom" placeholder="john@example.com" required />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Subject" class="form-label-custom"></label>
+                        <input asp-for="Subject" class="form-control form-control-custom" placeholder="Route recommendation inquiry" required />
+                        <span asp-validation-for="Subject" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Message" class="form-label-custom"></label>
+                        <textarea asp-for="Message" class="form-control form-control-custom" rows="5" placeholder="How can we assist your trip planning?" required></textarea>
+                        <span asp-validation-for="Message" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary-custom w-100 py-3">
+                            <i class="bi bi-send-fill me-2"></i> Submit Enquiry
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    }
+</div>

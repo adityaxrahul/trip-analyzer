@@ -1,0 +1,734 @@
+@model TripAnalyzer.ViewModels.TripAnalysisResultViewModel
+@{
+    ViewData["Title"] = $"Trip Analysis: {Model.Trip.Source} to {Model.Trip.Destination}";
+    var recommended = Model.RecommendedOption;
+    var cheapest = Model.CheapestOption;
+    var fastest = Model.FastestOption;
+    var convenient = Model.MostConvenientOption;
+}
+
+<style>
+    /* Analysis Page Specific Warm Stone Travel Tokens */
+    .analysis-page {
+        background-color: var(--bg-base);
+        color: var(--text-primary);
+    }
+
+    .analysis-header-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-default);
+        border-radius: 18px;
+        padding: 1.75rem 2rem;
+        box-shadow: var(--shadow-md);
+    }
+
+    .badge-live-route {
+        background: var(--chip-teal);
+        border: 1px solid var(--border-default);
+        color: var(--accent-secondary);
+        font-weight: 700;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        padding: 0.4rem 0.85rem;
+        border-radius: 9999px;
+    }
+
+    .badge-fallback-route {
+        background: var(--chip-amber);
+        border: 1px solid rgba(181, 121, 42, 0.35);
+        color: var(--accent-warning);
+        font-weight: 700;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        padding: 0.4rem 0.85rem;
+        border-radius: 9999px;
+    }
+
+    /* Recommended Card - Highlight Winner */
+    .card-recommended-winner {
+        background: linear-gradient(145deg, rgba(62, 122, 86, 0.08) 0%, var(--bg-card) 50%, rgba(193, 89, 46, 0.05) 100%);
+        border: 2px solid var(--accent-success);
+        border-radius: 20px;
+        padding: 2rem;
+        position: relative;
+        box-shadow: 0 0 25px rgba(62, 122, 86, 0.15), var(--shadow-lg);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card-recommended-winner:hover {
+        box-shadow: 0 0 35px rgba(62, 122, 86, 0.25), var(--shadow-lg);
+    }
+
+    .badge-best-overall {
+        background: var(--accent-success);
+        color: #ffffff;
+        font-weight: 800;
+        font-size: 0.75rem;
+        letter-spacing: 0.06em;
+        padding: 0.45rem 1rem;
+        border-radius: 9999px;
+        box-shadow: 0 2px 10px rgba(62, 122, 86, 0.25);
+    }
+
+    /* Standard Option Card */
+    .card-option-standard {
+        background: var(--bg-card);
+        border: 1px solid var(--border-default);
+        border-radius: 16px;
+        padding: 1.5rem 1.75rem;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.2s ease;
+    }
+
+    .card-option-standard:hover {
+        background: var(--bg-card-hover);
+        border-color: var(--accent-secondary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Transport Mode Icon Badges */
+    .mode-icon-box {
+        width: 54px;
+        height: 54px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.65rem;
+        flex-shrink: 0;
+    }
+
+    .mode-icon-train {
+        background: var(--chip-orange);
+        border: 1px solid rgba(193, 89, 46, 0.25);
+        color: var(--accent-primary);
+    }
+
+    .mode-icon-bus {
+        background: var(--chip-teal);
+        border: 1px solid rgba(28, 58, 74, 0.25);
+        color: var(--accent-secondary);
+    }
+
+    .mode-icon-flight {
+        background: var(--chip-sand);
+        border: 1px solid var(--border-default);
+        color: var(--accent-info);
+    }
+
+    .mode-icon-car {
+        background: rgba(62, 122, 86, 0.10);
+        border: 1px solid rgba(62, 122, 86, 0.25);
+        color: var(--accent-success);
+    }
+
+    /* Score Ring / Badge */
+    .score-badge-custom {
+        width: 62px;
+        height: 62px;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-card);
+        border: 3px solid var(--accent-secondary);
+        box-shadow: 0 0 10px rgba(28, 58, 74, 0.12);
+        flex-shrink: 0;
+    }
+
+    .score-badge-custom.score-winner {
+        border-color: var(--accent-success);
+        box-shadow: 0 0 12px rgba(62, 122, 86, 0.25);
+    }
+
+    .score-badge-custom .score-val {
+        font-size: 1.25rem;
+        font-weight: 800;
+        line-height: 1;
+        color: var(--text-primary);
+    }
+
+    .score-badge-custom .score-lbl {
+        font-size: 0.55rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-top: 2px;
+    }
+
+    /* Comparison Badges */
+    .badge-cheapest-pill {
+        background: var(--chip-teal);
+        border: 1px solid var(--border-default);
+        color: var(--accent-secondary);
+        font-weight: 700;
+        font-size: 0.72rem;
+        padding: 0.3rem 0.75rem;
+        border-radius: 9999px;
+    }
+
+    .badge-fastest-pill {
+        background: var(--chip-amber);
+        border: 1px solid rgba(181, 121, 42, 0.35);
+        color: var(--accent-warning);
+        font-weight: 700;
+        font-size: 0.72rem;
+        padding: 0.3rem 0.75rem;
+        border-radius: 9999px;
+    }
+
+    .badge-convenient-pill {
+        background: var(--chip-orange);
+        border: 1px solid rgba(193, 89, 46, 0.3);
+        color: var(--accent-primary);
+        font-weight: 700;
+        font-size: 0.72rem;
+        padding: 0.3rem 0.75rem;
+        border-radius: 9999px;
+    }
+
+    .badge-recommended-pill {
+        background: rgba(62, 122, 86, 0.12);
+        border: 1px solid rgba(62, 122, 86, 0.3);
+        color: var(--accent-success);
+        font-weight: 700;
+        font-size: 0.72rem;
+        padding: 0.3rem 0.75rem;
+        border-radius: 9999px;
+    }
+
+    .badge-benchmark {
+        background: var(--chip-sand);
+        border: 1px solid var(--border-default);
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        padding: 0.2rem 0.6rem;
+        border-radius: 6px;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .analysis-header-card {
+            padding: 1.25rem 1rem;
+        }
+        .card-recommended-winner {
+            padding: 1.25rem 1rem;
+        }
+        .card-option-standard {
+            padding: 1.25rem 1rem;
+        }
+        .score-badge-custom {
+            width: 52px;
+            height: 52px;
+        }
+        .score-badge-custom .score-val {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+
+<div class="analysis-page py-4 py-md-5">
+    <div class="container max-w-6xl pb-5 mb-4">
+        
+        <!-- ── 1. TRIP HEADER OVERVIEW ─────────────────────────────────────────── -->
+        <div class="analysis-header-card mb-4">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                <div>
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                        <span class="badge px-2.5 py-1 uppercase tracking-wider fs-8 fw-bold" style="background: var(--chip-orange); color: var(--accent-primary); border: 1px solid var(--border-default);">
+                            TRIP ANALYSIS
+                        </span>
+                        @if (!Model.IsRouteFallback && Model.RoadDistanceKm.HasValue)
+                        {
+                            <span class="badge-live-route">
+                                <i class="bi bi-broadcast me-1"></i> LIVE ROUTE API
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge-fallback-route">
+                                <i class="bi bi-exclamation-triangle me-1"></i> ESTIMATED FALLBACK
+                            </span>
+                        }
+                    </div>
+
+                    <h1 class="fw-extrabold mb-2 fs-2 fs-md-1" style="color: var(--text-primary);">
+                        @Model.Trip.Source <i class="bi bi-arrow-right mx-1" style="color: var(--accent-primary);"></i> @Model.Trip.Destination
+                    </h1>
+
+                    <div class="d-flex flex-wrap gap-2 gap-md-3 small align-items-center" style="color: var(--text-muted);">
+                        @if (!Model.IsRouteFallback && Model.RoadDistanceKm.HasValue)
+                        {
+                            <span class="fw-semibold" style="color: var(--text-primary);">
+                                <i class="bi bi-signpost-2 me-1 text-success"></i> Road Distance: @Model.RoadDistanceKm.Value.ToString("N0") km
+                            </span>
+                            @if (!string.IsNullOrEmpty(Model.RoadDurationText))
+                            {
+                                <span class="d-none d-sm-inline opacity-50">•</span>
+                                <span class="fw-semibold" style="color: var(--text-primary);">
+                                    <i class="bi bi-clock me-1 text-info"></i> Estimated Road Time: @Model.RoadDurationText
+                                </span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="fw-semibold" style="color: var(--text-primary);">
+                                <i class="bi bi-geo-alt me-1 text-warning"></i> Approx. Straight-Line Distance: @Model.StraightLineDistanceKm.ToString("N0") km
+                            </span>
+                        }
+                        <span class="d-none d-sm-inline opacity-50">•</span>
+                        <span><i class="bi bi-calendar-event me-1 text-cyan"></i> @Model.Trip.TravelDate.ToString("ddd, MMM dd, yyyy")</span>
+                        <span class="d-none d-sm-inline opacity-50">•</span>
+                        <span><i class="bi bi-people me-1 text-primary"></i> @Model.Trip.Passengers Passenger@(Model.Trip.Passengers > 1 ? "s" : "")</span>
+                    </div>
+
+                    @if (Model.IsRouteFallback && !string.IsNullOrEmpty(Model.RouteDiagnosticMessage))
+                    {
+                        <div class="mt-2 text-warning small">
+                            <i class="bi bi-info-circle me-1"></i> Diagnostic: @Model.RouteDiagnosticMessage
+                        </div>
+                    }
+                </div>
+
+                <!-- Header Actions -->
+                <div class="d-flex flex-wrap gap-2 mt-2 mt-lg-0">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <form asp-controller="Trip" asp-action="SaveTrip" method="post">
+                            <input type="hidden" name="tripId" value="@Model.Trip.Id" />
+                            <button type="submit" class="btn @(Model.IsSaved ? "btn-warning" : "btn-secondary-custom")">
+                                <i class="bi @(Model.IsSaved ? "bi-bookmark-star-fill" : "bi-bookmark-plus") me-1"></i>
+                                @(Model.IsSaved ? "Saved in Favorites" : "Save Trip")
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path@Context.Request.QueryString" class="btn btn-secondary-custom">
+                            <i class="bi bi-bookmark-plus me-1"></i> Sign in to Save
+                        </a>
+                    }
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary-custom">
+                        <i class="bi bi-search me-1"></i> New Search
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 2. RECOMMENDED RESULT HIGHLIGHT CARD ───────────────────────────── -->
+        @if (recommended != null)
+        {
+            var recOpt = recommended.TransportOption;
+            int recHrs = recommended.CalculatedDurationMinutes / 60;
+            int recMins = recommended.CalculatedDurationMinutes % 60;
+            string mode = recOpt?.Mode ?? "Transport";
+
+            string distLabel = mode == "Train" ? "Estimated Rail Distance" :
+                               mode == "Flight" ? "Straight-Line Air Distance" :
+                               "Road Distance";
+
+            string durLabel = mode == "Car" && !Model.IsRouteFallback ? "Google Estimated Road Time" :
+                              mode == "Train" ? "Estimated Train Duration" :
+                              mode == "Flight" ? "Estimated Flight Duration" :
+                              mode == "Bus" ? "Estimated Bus Travel Time" : "Estimated Road Duration";
+
+            <div class="card-recommended-winner mb-4 mb-md-5">
+                <!-- Top Badge Strip -->
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mb-3">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <span class="badge-best-overall">
+                            <i class="bi bi-trophy-fill me-1.5"></i> BEST OVERALL
+                        </span>
+                        @if (recommended.IsCheapest)
+                        {
+                            <span class="badge-cheapest-pill">
+                                <i class="bi bi-tag-fill me-1"></i> CHEAPEST
+                            </span>
+                        }
+                        @if (recommended.IsFastest)
+                        {
+                            <span class="badge-fastest-pill">
+                                <i class="bi bi-lightning-fill me-1"></i> FASTEST
+                            </span>
+                        }
+                        @if (recommended.IsMostConvenient)
+                        {
+                            <span class="badge-convenient-pill">
+                                <i class="bi bi-heart-fill me-1"></i> MOST CONVENIENT
+                            </span>
+                        }
+                    </div>
+                    <div class="small fw-semibold" style="color: var(--accent-success);">
+                        <i class="bi bi-shield-check me-1"></i> Top Multi-Factor Travel Recommendation
+                    </div>
+                </div>
+
+                <!-- Main Recommendation Grid -->
+                <div class="row align-items-center g-3 g-md-4">
+                    <!-- Mode & Carrier -->
+                    <div class="col-12 col-md-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="mode-icon-box @(mode == "Train" ? "mode-icon-train" : mode == "Bus" ? "mode-icon-bus" : mode == "Flight" ? "mode-icon-flight" : "mode-icon-car")">
+                                @if (mode == "Train") { <i class="bi bi-train-front-fill"></i> }
+                                else if (mode == "Bus") { <i class="bi bi-bus-front-fill"></i> }
+                                else if (mode == "Flight") { <i class="bi bi-airplane-fill"></i> }
+                                else { <i class="bi bi-car-front-fill"></i> }
+                            </div>
+                            <div>
+                                <div class="small fw-bold uppercase tracking-wider" style="color: var(--text-muted); font-size: 0.72rem;">RECOMMENDED MODE</div>
+                                <h3 class="fw-extrabold mb-0 fs-4" style="color: var(--text-primary);">@mode.ToUpper()</h3>
+                                @if (recOpt?.IsEstimatedData == true)
+                                {
+                                    <span class="badge-benchmark mt-1 d-inline-block">Benchmark / Estimated</span>
+                                }
+                                else
+                                {
+                                    <div class="small fw-semibold text-info mt-0.5">@recOpt?.CarrierName</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fare -->
+                    <div class="col-6 col-md-3 text-start text-md-center">
+                        <div class="small uppercase fw-bold" style="color: var(--text-muted); font-size: 0.72rem; letter-spacing: 0.05em;">ESTIMATED FARE (@Model.Trip.Passengers PAX)</div>
+                        <div class="fw-extrabold my-1 fs-2" style="color: var(--accent-success);">₹@recommended.CalculatedPrice.ToString("N0")</div>
+                        <div class="small" style="color: var(--text-muted);">₹@recOpt?.BasePricePerPassenger.ToString("N0") / person</div>
+                    </div>
+
+                    <!-- Duration & Mode Distance -->
+                    <div class="col-6 col-md-3 text-start text-md-center">
+                        <div class="small uppercase fw-bold" style="color: var(--text-muted); font-size: 0.72rem; letter-spacing: 0.05em;">@durLabel.ToUpper()</div>
+                        <div class="fw-extrabold my-1 fs-3" style="color: var(--text-primary);">
+                            @(recHrs > 0 ? $"{recHrs}h " : "")@($"{recMins}m")
+                        </div>
+                        <div class="small" style="color: var(--text-muted);">
+                            @distLabel: @(recOpt?.DistanceKm.ToString("N0")) km
+                        </div>
+                    </div>
+
+                    <!-- Overall Score -->
+                    <div class="col-12 col-md-3 d-flex justify-content-start justify-content-md-end mt-2 mt-md-0">
+                        <div class="score-badge-custom score-winner">
+                            <span class="score-val" style="color: var(--accent-success);">@recommended.OverallScore</span>
+                            <span class="score-lbl">SCORE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Explanation Box -->
+                <div class="mt-3.5 p-3 rounded-3" style="background: var(--bg-base); border: 1px solid rgba(62, 122, 86, 0.25);">
+                    <div class="d-flex gap-2.5 align-items-start">
+                        <i class="bi bi-check-circle-fill fs-5" style="color: var(--accent-success); flex-shrink: 0; margin-top: 1px;"></i>
+                        <div>
+                            <strong class="d-block mb-1" style="color: var(--accent-success); font-size: 0.9rem;">Recommendation Analysis:</strong>
+                            <p class="mb-0 small" style="color: var(--text-primary); line-height: 1.55;">@recommended.ReasoningText</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- ── 3. ALL TRANSPORT OPTIONS COMPARISON ────────────────────────────── -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold mb-0 fs-4" style="color: var(--text-primary);">All Transport Options Comparison (@Model.Analyses.Count)</h4>
+            <span class="small text-secondary" style="color: var(--text-muted) !important;">Ranked by Intelligent Multi-Factor Scoring</span>
+        </div>
+
+        <div class="d-flex flex-column gap-3 mb-5">
+            @foreach (var item in Model.Analyses.OrderByDescending(a => a.OverallScore))
+            {
+                var opt = item.TransportOption;
+                int hrs = item.CalculatedDurationMinutes / 60;
+                int mins = item.CalculatedDurationMinutes % 60;
+                string mode = opt?.Mode ?? "Transport";
+
+                string distLabel = mode == "Train" ? "Rail Distance" :
+                                   mode == "Flight" ? "Air Distance" :
+                                   "Road Distance";
+
+                string durLabel = mode == "Car" && !Model.IsRouteFallback ? "Road Time" :
+                                  mode == "Train" ? "Train Duration" :
+                                  mode == "Flight" ? "Flight Duration" :
+                                  mode == "Bus" ? "Bus Duration" : "Road Time";
+
+                <div class="card-option-standard @(item.IsRecommended ? "border-success-subtle" : "")">
+                    <div class="row align-items-center g-3">
+                        <!-- Mode Column -->
+                        <div class="col-12 col-md-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="mode-icon-box @(mode == "Train" ? "mode-icon-train" : mode == "Bus" ? "mode-icon-bus" : mode == "Flight" ? "mode-icon-flight" : "mode-icon-car")">
+                                    @if (mode == "Train") { <i class="bi bi-train-front-fill"></i> }
+                                    else if (mode == "Bus") { <i class="bi bi-bus-front-fill"></i> }
+                                    else if (mode == "Flight") { <i class="bi bi-airplane-fill"></i> }
+                                    else { <i class="bi bi-car-front-fill"></i> }
+                                </div>
+                                <div>
+                                    <div class="fw-bold fs-5" style="color: var(--text-primary);">@mode</div>
+                                    @if (opt?.IsEstimatedData == true)
+                                    {
+                                        <span class="badge-benchmark mt-0.5 d-inline-block">Benchmark / Estimated</span>
+                                    }
+                                    else
+                                    {
+                                        <div class="small fw-semibold text-info">@opt?.CarrierName</div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fare Column -->
+                        <div class="col-6 col-md-2">
+                            <div class="small uppercase fw-bold" style="color: var(--text-muted); font-size: 0.72rem;">ESTIMATED FARE</div>
+                            <div class="fw-extrabold fs-4" style="color: var(--accent-secondary);">₹@item.CalculatedPrice.ToString("N0")</div>
+                            <div class="small" style="color: var(--text-muted);">(@Model.Trip.Passengers PAX)</div>
+                        </div>
+
+                        <!-- Duration & Mode Distance Column -->
+                        <div class="col-6 col-md-2">
+                            <div class="small uppercase fw-bold" style="color: var(--text-muted); font-size: 0.72rem;">@durLabel.ToUpper()</div>
+                            <div class="fw-bold fs-5" style="color: var(--text-primary);">@(hrs > 0 ? $"{hrs}h " : "")@($"{mins}m")</div>
+                            <div class="small" style="color: var(--text-muted);">
+                                @distLabel: @(opt?.DistanceKm.ToString("N0")) km
+                            </div>
+                        </div>
+
+                        <!-- Badges & Amenities Column -->
+                        <div class="col-12 col-md-3">
+                            <div class="d-flex flex-wrap gap-1.5 mb-1.5">
+                                @if (item.IsRecommended)
+                                {
+                                    <span class="badge-recommended-pill"><i class="bi bi-trophy-fill me-1"></i> Best Overall</span>
+                                }
+                                @if (item.IsCheapest)
+                                {
+                                    <span class="badge-cheapest-pill"><i class="bi bi-tag-fill me-1"></i> Cheapest</span>
+                                }
+                                @if (item.IsFastest)
+                                {
+                                    <span class="badge-fastest-pill"><i class="bi bi-lightning-fill me-1"></i> Fastest</span>
+                                }
+                                @if (item.IsMostConvenient)
+                                {
+                                    <span class="badge-convenient-pill"><i class="bi bi-heart-fill me-1"></i> Convenient</span>
+                                }
+                            </div>
+                            <div class="small" style="color: var(--text-muted);">
+                                @if (opt?.IsEstimatedData == true)
+                                {
+                                    <span>Comfort: @(opt.ComfortScore)/100 • Eco: @(opt.EcoRating)/5</span>
+                                }
+                                else
+                                {
+                                    <span>@opt?.Amenities</span>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Score Column -->
+                        <div class="col-12 col-md-2 text-md-end d-flex justify-content-between justify-content-md-end align-items-center">
+                            <span class="d-md-none text-secondary small fw-semibold">Overall Score</span>
+                            <div class="score-badge-custom ms-md-auto @(item.IsRecommended ? "score-winner" : "")">
+                                <span class="score-val" style="color: @(item.IsRecommended ? "var(--accent-success)" : "var(--accent-secondary)");">@item.OverallScore</span>
+                                <span class="score-lbl">SCORE</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reasoning text -->
+                    <div class="mt-2.5 pt-2 border-top small" style="color: var(--text-muted); border-color: var(--border-default) !important;">
+                        <i class="bi bi-chat-left-text me-1 text-primary"></i> <span style="color: var(--text-primary);">@item.ReasoningText</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- ── 4. INTERACTIVE GOOGLE MAP SECTION ──────────────────────────────── -->
+        @if (Model.SourceLatitude != 0 && Model.DestinationLatitude != 0)
+        {
+            <div class="analysis-header-card mb-4">
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-map-fill text-primary fs-5"></i>
+                        <h5 class="mb-0 fw-bold" style="color: var(--text-primary);">Interactive Geographic Route Map</h5>
+                        @if (!Model.IsRouteFallback && Model.RoadDistanceKm.HasValue)
+                        {
+                            <span class="badge-live-route ms-2">
+                                <i class="bi bi-broadcast me-1"></i> LIVE ROUTE API
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge-fallback-route ms-2">
+                                <i class="bi bi-exclamation-triangle me-1"></i> ESTIMATED FALLBACK
+                            </span>
+                        }
+                    </div>
+                    <div class="small d-flex flex-wrap gap-2 gap-md-3" style="color: var(--text-muted);">
+                        @if (!Model.IsRouteFallback && Model.RoadDistanceKm.HasValue)
+                        {
+                            <span class="fw-semibold" style="color: var(--text-primary);"><i class="bi bi-signpost-2 me-1 text-success"></i>@Model.RoadDistanceKm.Value.ToString("N0") km road</span>
+                            @if (!string.IsNullOrEmpty(Model.RoadDurationText))
+                            {
+                                <span class="fw-semibold" style="color: var(--text-primary);"><i class="bi bi-clock me-1 text-info"></i>@Model.RoadDurationText drive</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="fw-semibold" style="color: var(--text-primary);"><i class="bi bi-geo-alt me-1 text-warning"></i>@Model.StraightLineDistanceKm.ToString("N0") km straight-line</span>
+                        }
+                    </div>
+                </div>
+
+                <div id="trip-map"
+                     style="height: 440px; width: 100%; border-radius: 14px; overflow: hidden; background: var(--bg-base); border: 1px solid var(--border-default);"
+                     data-src-lat="@Model.SourceLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                     data-src-lng="@Model.SourceLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                     data-dest-lat="@Model.DestinationLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                     data-dest-lng="@Model.DestinationLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                     data-polyline="@(Model.EncodedPolyline ?? "")"
+                     data-fallback="@Model.IsRouteFallback.ToString().ToLower()">
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+@if (Model.SourceLatitude != 0 && Model.DestinationLatitude != 0)
+{
+    @section Scripts {
+        <script>
+        (function () {
+            var mapEl = document.getElementById('trip-map');
+            if (!mapEl) return;
+
+            var srcLat  = parseFloat(mapEl.dataset.srcLat);
+            var srcLng  = parseFloat(mapEl.dataset.srcLng);
+            var dstLat  = parseFloat(mapEl.dataset.destLat);
+            var dstLng  = parseFloat(mapEl.dataset.destLng);
+            var polyStr = mapEl.dataset.polyline;
+            var isFallback = mapEl.dataset.fallback === 'true';
+
+            window.gm_authFailure = function() {
+                if (mapEl) {
+                    mapEl.innerHTML = `
+                        <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4" style="background: rgba(248, 246, 241, 0.95); color: #211C17;">
+                            <i class="bi bi-exclamation-octagon text-warning fs-1 mb-2"></i>
+                            <h6 class="fw-bold mb-1" style="color: #211C17;">Google Maps Authentication Notice</h6>
+                            <p class="small text-secondary max-w-md mb-2">Google Maps JavaScript API key is either pending activation or restricted. Coordinate points are verified.</p>
+                            <span class="badge border" style="background: #EEEAE2; color: #211C17; border-color: #DED5C4;">Origin: (${srcLat.toFixed(4)}, ${srcLng.toFixed(4)}) &rarr; Dest: (${dstLat.toFixed(4)}, ${dstLng.toFixed(4)})</span>
+                        </div>`;
+                }
+            };
+
+            function initTripMap() {
+                if (typeof google === 'undefined' || !google.maps) return;
+
+                var srcPos  = { lat: srcLat,  lng: srcLng  };
+                var destPos = { lat: dstLat, lng: dstLng };
+
+                var midLat  = (srcLat + dstLat) / 2;
+                var midLng  = (srcLng + dstLng) / 2;
+
+                var map = new google.maps.Map(mapEl, {
+                    center: { lat: midLat, lng: midLng },
+                    zoom: 6,
+                    mapTypeId: 'roadmap',
+                    styles: [
+                        { elementType: 'geometry',         stylers: [{ color: '#f5f1ea' }] },
+                        { elementType: 'labels.text.fill', stylers: [{ color: '#52493d' }] },
+                        { elementType: 'labels.text.stroke', stylers: [{ color: '#f5f1ea' }] },
+                        { featureType: 'road',             elementType: 'geometry',         stylers: [{ color: '#ffffff' }] },
+                        { featureType: 'road.highway',     elementType: 'geometry',         stylers: [{ color: '#eeddc8' }] },
+                        { featureType: 'water',            elementType: 'geometry',         stylers: [{ color: '#c4d8e2' }] },
+                        { featureType: 'administrative',   elementType: 'geometry.stroke',  stylers: [{ color: '#d5cbbe' }] },
+                        { featureType: 'poi',              stylers: [{ visibility: 'off' }] }
+                    ],
+                    disableDefaultUI: false,
+                    zoomControl: true,
+                    fullscreenControl: true
+                });
+
+                // Source marker (green)
+                new google.maps.Marker({
+                    position: srcPos,
+                    map: map,
+                    title: @Json.Serialize(Model.Trip.Source),
+                    label: { text: 'A', color: '#fff', fontWeight: 'bold' },
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 10,
+                        fillColor: '#3E7A56',
+                        fillOpacity: 1,
+                        strokeColor: '#fff',
+                        strokeWeight: 2
+                    }
+                });
+
+                // Destination marker (red)
+                new google.maps.Marker({
+                    position: destPos,
+                    map: map,
+                    title: @Json.Serialize(Model.Trip.Destination),
+                    label: { text: 'B', color: '#fff', fontWeight: 'bold' },
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 10,
+                        fillColor: '#C1592E',
+                        fillOpacity: 1,
+                        strokeColor: '#fff',
+                        strokeWeight: 2
+                    }
+                });
+
+                // Polyline or straight-line
+                if (!isFallback && polyStr && polyStr.length > 0 && google.maps.geometry && google.maps.geometry.encoding) {
+                    var decodedPath = google.maps.geometry.encoding.decodePath(polyStr);
+                    var routeLine = new google.maps.Polyline({
+                        path: decodedPath,
+                        geodesic: true,
+                        strokeColor: '#1C3A4A',
+                        strokeOpacity: 0.9,
+                        strokeWeight: 4
+                    });
+                    routeLine.setMap(map);
+
+                    var bounds = new google.maps.LatLngBounds();
+                    bounds.extend(srcPos);
+                    bounds.extend(destPos);
+                    decodedPath.forEach(function (p) { bounds.extend(p); });
+                    map.fitBounds(bounds);
+                } else {
+                    var line = new google.maps.Polyline({
+                        path: [srcPos, destPos],
+                        geodesic: true,
+                        strokeColor: '#B5792A',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 3,
+                        icons: [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 3 }, offset: '0', repeat: '20px' }]
+                    });
+                    line.setMap(map);
+
+                    var bounds = new google.maps.LatLngBounds();
+                    bounds.extend(srcPos);
+                    bounds.extend(destPos);
+                    map.fitBounds(bounds);
+                }
+            }
+
+            window.__tripMapInit = initTripMap;
+        })();
+        </script>
+        @if (!string.IsNullOrEmpty(Model.GoogleMapsApiKey))
+        {
+            <script
+                src="https://maps.googleapis.com/maps/api/js?key=@Model.GoogleMapsApiKey&libraries=geometry&callback=__tripMapInit&loading=async"
+                async defer>
+            </script>
+        }
+    }
+}

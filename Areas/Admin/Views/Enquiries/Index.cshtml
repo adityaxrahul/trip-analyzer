@@ -1,0 +1,127 @@
+@model List<TripAnalyzer.Models.Enquiry>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Customer Enquiries Inbox";
+}
+
+@* TempData alerts *@
+@if (TempData["SuccessMessage"] != null) {
+    <div class="alert alert-success" role="alert">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null) {
+    <div class="alert alert-danger" role="alert">@TempData["ErrorMessage"]</div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold mb-0" style="color: var(--text-primary);">Support Enquiries (@Model.Count)</h3>
+</div>
+
+<div class="admin-stat-card mb-4">
+    <form method="get" class="row g-2">
+        <div class="col-md-4">
+            <select name="status" class="form-select form-control-custom">
+                <option value="">All Statuses (Pending, In Progress, Resolved)</option>
+                <option value="Pending" selected="@(ViewBag.SelectedStatus == "Pending")">Pending</option>
+                <option value="In Progress" selected="@(ViewBag.SelectedStatus == "In Progress")">In Progress</option>
+                <option value="Resolved" selected="@(ViewBag.SelectedStatus == "Resolved")">Resolved</option>
+            </select>
+        </div>
+        <div class="col-md-5">
+            <input type="text" name="search" value="@ViewBag.SearchTerm" class="form-control form-control-custom" placeholder="Search by name, email, subject, or message..." />
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary-custom w-100">Filter</button>
+            <a asp-action="Index" class="btn btn-secondary-custom">Reset</a>
+        </div>
+    </form>
+</div>
+
+<div class="admin-stat-card p-0" style="overflow: hidden;">
+    <div class="table-sticky-container">
+        <table class="table table-custom align-middle mb-0" style="min-width: 900px;">
+            <thead>
+                <tr>
+                    <th class="table-sticky-col-1" style="width: 140px; min-width: 140px; max-width: 140px;">Sender Name</th>
+                    <th class="table-sticky-col-2" style="width: 180px; min-width: 180px; max-width: 180px;">Email</th>
+                    <th>Subject</th>
+                    <th style="width: 160px;">Received At</th>
+                    <th style="width: 120px;">Status</th>
+                    <th class="text-end" style="width: 250px; padding-right: 1.5rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model == null || !Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-secondary py-4">No enquiries found in this category.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var e in Model)
+                    {
+                        <tr>
+                            <!-- Sticky Column 1 -->
+                            <td class="table-sticky-col-1 fw-bold text-truncate" style="color: var(--text-primary); width: 140px; min-width: 140px; max-width: 140px;">
+                                @e.Name
+                            </td>
+                            <!-- Sticky Column 2 -->
+                            <td class="table-sticky-col-2 text-truncate" style="width: 180px; min-width: 180px; max-width: 180px;">
+                                <a href="mailto:@e.Email" class="text-info text-decoration-none">@e.Email</a>
+                            </td>
+                            <!-- Scrollable Columns -->
+                            <td class="text-truncate fw-semibold" style="color: var(--text-primary); max-width: 200px;">
+                                @e.Subject
+                            </td>
+                            <td class="small text-secondary">
+                                @e.CreatedAt.ToString("MMM dd, yyyy HH:mm")
+                            </td>
+                            <td>
+                                <span class="badge @(e.Status == "Pending" ? "bg-warning text-dark" : e.Status == "In Progress" ? "bg-info text-dark" : "bg-success")">
+                                    @e.Status
+                                </span>
+                            </td>
+                            <td class="text-end" style="padding-right: 1.5rem;">
+                                <div class="d-flex justify-content-end gap-1 flex-wrap">
+                                    <a asp-action="Details" asp-route-id="@e.Id" class="btn btn-xs btn-outline-info" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">View</a>
+                                    <a asp-action="Reply" asp-route-id="@e.Id" class="btn btn-xs btn-primary-custom" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Reply</a>
+                                    
+                                    <!-- Status Toggle Dropdown or Quick Marks -->
+                                    @if (e.Status == "Pending")
+                                    {
+                                        <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@e.Id" />
+                                            <input type="hidden" name="status" value="In Progress" />
+                                            <button type="submit" class="btn btn-xs btn-outline-warning" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Work</button>
+                                        </form>
+                                    }
+                                    @if (e.Status != "Resolved")
+                                    {
+                                        <form asp-action="Resolve" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@e.Id" />
+                                            <button type="submit" class="btn btn-xs btn-outline-success" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Resolve</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@e.Id" />
+                                            <input type="hidden" name="status" value="Pending" />
+                                            <button type="submit" class="btn btn-xs btn-outline-secondary" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Reopen</button>
+                                        </form>
+                                    }
+
+                                    <!-- Delete Form -->
+                                    <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this enquiry?');">
+                                        <input type="hidden" name="id" value="@e.Id" />
+                                        <button type="submit" class="btn btn-xs btn-outline-danger" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

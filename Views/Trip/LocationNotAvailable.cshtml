@@ -1,0 +1,105 @@
+@model TripAnalyzer.ViewModels.TripSearchViewModel
+@{
+    ViewData["Title"] = "Location / Route Could Not Be Verified";
+    bool sourceAvailable = ViewBag.SourceAvailable ?? true;
+    bool destAvailable = ViewBag.DestinationAvailable ?? true;
+    string sourceQuery = ViewBag.SourceQuery ?? Model?.Source ?? "";
+    string destQuery = ViewBag.DestinationQuery ?? Model?.Destination ?? "";
+    string? customReason = ViewBag.CustomReason as string;
+    var supportedLocations = ViewBag.SupportedLocations as List<string> ?? new List<string>();
+
+    string verificationMessage;
+    if (!string.IsNullOrEmpty(customReason))
+    {
+        verificationMessage = customReason;
+    }
+    else if (sourceAvailable && !destAvailable)
+    {
+        verificationMessage = $"\"{sourceQuery}\" was found, but the destination \"{destQuery}\" could not be verified.";
+    }
+    else if (!sourceAvailable && destAvailable)
+    {
+        verificationMessage = $"\"{destQuery}\" was found, but the origin \"{sourceQuery}\" could not be verified.";
+    }
+    else if (!sourceAvailable && !destAvailable)
+    {
+        verificationMessage = $"Neither \"{sourceQuery}\" nor \"{destQuery}\" could be verified in Trip Analyzer.";
+    }
+    else
+    {
+        verificationMessage = "This location or route is not available in Trip Analyzer.";
+    }
+}
+
+<div class="container py-5 max-w-4xl">
+    <div class="glass-panel text-center py-5 px-4 px-md-5 mb-4 border" style="background: var(--bg-card); box-shadow: var(--shadow-lg); border-radius: 20px; border-color: var(--border-default) !important;">
+        <!-- Alert Icon -->
+        <div class="d-inline-flex p-3 rounded-circle mb-4 fs-1" style="background: var(--chip-amber); color: var(--accent-warning); border: 1px solid rgba(181, 121, 42, 0.3);">
+            <i class="bi bi-geo-alt-fill"></i>
+        </div>
+        
+        <!-- Modal Heading -->
+        <div class="badge px-3 py-1.5 uppercase tracking-wider fs-8 fw-bold mb-3" style="background: var(--chip-amber); color: var(--accent-warning); border: 1px solid rgba(181, 121, 42, 0.3);">
+            VERIFICATION NOTICE
+        </div>
+        <h1 class="fw-extrabold mb-3 fs-2" style="color: var(--text-primary);">LOCATION / ROUTE COULD NOT BE VERIFIED</h1>
+        
+        <!-- Verification Explanation -->
+        <p class="fs-5 mb-4 max-w-2xl mx-auto fw-medium" style="color: var(--text-muted); line-height: 1.6;">
+            @verificationMessage
+        </p>
+
+        <!-- Status Cards for Source and Destination -->
+        <div class="row g-3 justify-content-center mb-4 text-start">
+            <div class="col-12 col-md-5">
+                <div class="p-3 rounded-3 border" style="background: var(--bg-card) !important; border-color: var(--border-default) !important;">
+                    <div class="small fw-bold uppercase tracking-wider mb-1" style="color: @(sourceAvailable ? "var(--accent-success)" : "var(--accent-warning)");">
+                        <i class="bi @(sourceAvailable ? "bi-check-circle-fill" : "bi-x-circle-fill") me-1"></i> ORIGIN
+                    </div>
+                    <div class="fs-5 fw-bold text-truncate" style="color: var(--text-primary);">@(string.IsNullOrWhiteSpace(sourceQuery) ? "Not Specified" : sourceQuery)</div>
+                    <div class="small mt-1" style="color: @(sourceAvailable ? "var(--accent-success)" : "var(--accent-warning)");">
+                        @(sourceAvailable ? "Verified active location" : "Not registered in database")
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-5">
+                <div class="p-3 rounded-3 border" style="background: var(--bg-card) !important; border-color: var(--border-default) !important;">
+                    <div class="small fw-bold uppercase tracking-wider mb-1" style="color: @(destAvailable ? "var(--accent-success)" : "var(--accent-warning)");">
+                        <i class="bi @(destAvailable ? "bi-check-circle-fill" : "bi-x-circle-fill") me-1"></i> DESTINATION
+                    </div>
+                    <div class="fs-5 fw-bold text-truncate" style="color: var(--text-primary);">@(string.IsNullOrWhiteSpace(destQuery) ? "Not Specified" : destQuery)</div>
+                    <div class="small mt-1" style="color: @(destAvailable ? "var(--accent-success)" : "var(--accent-warning)");">
+                        @(destAvailable ? "Verified active location" : "Not registered in database")
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (supportedLocations.Any())
+        {
+            <div class="p-3.5 rounded-3 mb-4 text-start" style="background: var(--bg-base); border: 1px solid var(--border-default);">
+                <div class="small fw-bold mb-2 d-flex align-items-center gap-1.5" style="color: var(--text-primary);">
+                    <i class="bi bi-globe text-info"></i> Supported Worldwide Locations:
+                </div>
+                <div class="d-flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1">
+                    @foreach (var loc in supportedLocations)
+                    {
+                        <span class="badge px-2.5 py-1.5 fs-8" style="background: var(--chip-teal); border: 1px solid var(--border-default); color: var(--accent-secondary);">
+                            <i class="bi bi-geo-alt me-1 text-cyan"></i>@loc
+                        </span>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- Action Buttons: TRY AGAIN / NEW SEARCH -->
+        <div class="d-flex flex-wrap gap-3 justify-content-center border-top pt-4" style="border-color: var(--border-default) !important;">
+            <button type="button" onclick="window.history.back()" class="btn btn-secondary-custom px-4 py-2.5">
+                <i class="bi bi-arrow-counterclockwise me-1.5"></i> TRY AGAIN
+            </button>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary-custom px-4 py-2.5">
+                <i class="bi bi-search me-1.5"></i> NEW SEARCH
+            </a>
+        </div>
+    </div>
+</div>

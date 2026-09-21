@@ -1,0 +1,31 @@
+@"
+# .NET Build outputs
+bin/
+obj/
+
+# User-specific files
+*.user
+*.userosscache
+*.sln.docstates
+
+# IDE files
+.vs/
+.vscode/
+.idea/
+
+# Environment / secrets
+appsettings.Development.json
+appsettings.Production.json
+*.env
+.env
+.env.*
+!.env.example
+
+# Local secrets / certificates
+*.pfx
+*.p12
+secrets.json
+
+# Logs
+*.log
+"@ | Set-Content .gitignore

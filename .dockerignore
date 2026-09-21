@@ -1,0 +1,12 @@
+.git
+.gitignore
+.dockerignore
+Dockerfile
+README.md
+bin/
+obj/
+.vs/
+.idea/
+.vscode/
+*.user
+*.log

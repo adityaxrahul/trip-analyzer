@@ -1,0 +1,149 @@
+@model TripAnalyzer.ViewModels.UserHistoryViewModel
+@{
+    ViewData["Title"] = "My Trip History & Saved Journeys";
+}
+
+<div class="container max-w-5xl py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h6 class="text-primary text-uppercase fw-bold">Personal Dashboard</h6>
+            <h1 class="fw-extrabold mb-1">Trip History &amp; Saved Journeys</h1>
+        </div>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary-custom">
+            <i class="bi bi-plus-lg me-1"></i> New Analysis
+        </a>
+    </div>
+
+    <!-- User Travel Statistics -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="glass-panel text-center">
+                <div class="display-6 fw-bold text-primary mb-1">@Model.TotalSearches</div>
+                <div class="text-secondary small uppercase fw-semibold">Total Searches</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="glass-panel text-center">
+                <div class="fs-3 fw-bold text-info mb-1">@Model.MostSearchedDestination</div>
+                <div class="text-secondary small uppercase fw-semibold">Top Destination</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="glass-panel text-center">
+                <div class="fs-3 fw-bold text-success mb-1">@Model.MostSelectedTransport</div>
+                <div class="text-secondary small uppercase fw-semibold">Preferred Transport</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs for History vs Saved -->
+    <ul class="nav nav-tabs border-secondary mb-4" id="historyTab" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active bg-transparent text-white border-0 border-bottom border-primary border-3 fw-bold" id="saved-tab" data-bs-toggle="tab" data-bs-target="#saved" type="button">
+                <i class="bi bi-bookmark-star me-1 text-warning"></i> Favorites (@Model.SavedTrips.Count)
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link bg-transparent text-white border-0 fw-bold" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button">
+                <i class="bi bi-clock-history me-1 text-primary"></i> Search History (@Model.HistoryTrips.Count)
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="historyTabContent">
+        <!-- Saved Trips Tab -->
+        <div class="tab-pane fade show active" id="saved">
+            @if (Model.SavedTrips != null && Model.SavedTrips.Any())
+            {
+                <div class="d-flex flex-column gap-3">
+                    @foreach (var saved in Model.SavedTrips)
+                    {
+                        var t = saved.Trip;
+                        if (t == null) continue;
+                        var rec = t.Analyses?.FirstOrDefault(a => a.IsRecommended);
+
+                        <div class="glass-panel">
+                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="badge bg-warning text-dark"><i class="bi bi-star-fill me-1"></i> Saved</span>
+                                        <span class="text-muted small">Saved on @saved.SavedAt.ToString("MMM dd, yyyy")</span>
+                                    </div>
+                                    <h4 class="fw-bold mb-1">@t.Source → @t.Destination</h4>
+                                    <div class="text-secondary small">
+                                        Travel Date: @t.TravelDate.ToString("MMM dd, yyyy") • @t.Passengers Passenger@(t.Passengers > 1 ? "s" : "")
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-3">
+                                    @if (rec != null)
+                                    {
+                                        <div class="text-end">
+                                            <div class="badge bg-success">Rec: @rec.TransportOption?.Mode</div>
+                                            <div class="fw-bold text-white fs-5">₹@rec.CalculatedPrice.ToString("N0")</div>
+                                        </div>
+                                    }
+                                    <a asp-controller="Trip" asp-action="Analyze" asp-route-source="@t.Source" asp-route-destination="@t.Destination" asp-route-travelDate="@t.TravelDate" asp-route-passengers="@t.Passengers" class="btn btn-primary-custom btn-sm">
+                                        Re-analyze
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="glass-panel text-center py-5">
+                    <i class="bi bi-bookmark text-muted fs-1 mb-2"></i>
+                    <p class="text-secondary mb-3">You haven't saved any trip recommendations yet.</p>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary-custom btn-sm">Analyze a Trip</a>
+                </div>
+            }
+        </div>
+
+        <!-- History Trips Tab -->
+        <div class="tab-pane fade" id="history">
+            @if (Model.HistoryTrips != null && Model.HistoryTrips.Any())
+            {
+                <div class="d-flex flex-column gap-3">
+                    @foreach (var t in Model.HistoryTrips)
+                    {
+                        var rec = t.Analyses?.FirstOrDefault(a => a.IsRecommended);
+
+                        <div class="glass-panel">
+                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                                <div>
+                                    <div class="text-muted small mb-1">Analyzed on @t.CreatedAt.ToString("MMM dd, yyyy hh:mm tt")</div>
+                                    <h4 class="fw-bold mb-1">@t.Source → @t.Destination</h4>
+                                    <div class="text-secondary small">
+                                        Date: @t.TravelDate.ToString("MMM dd, yyyy") • @t.Passengers Passenger@(t.Passengers > 1 ? "s" : "")
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-3">
+                                    <a asp-controller="Trip" asp-action="Analyze" asp-route-source="@t.Source" asp-route-destination="@t.Destination" asp-route-travelDate="@t.TravelDate" asp-route-passengers="@t.Passengers" class="btn btn-secondary-custom btn-sm">
+                                        View Details
+                                    </a>
+                                    <form asp-controller="Trip" asp-action="DeleteTrip" method="post" onsubmit="return confirm('Delete this search item?');">
+                                        <input type="hidden" name="id" value="@t.Id" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="glass-panel text-center py-5">
+                    <i class="bi bi-clock text-muted fs-1 mb-2"></i>
+                    <p class="text-secondary">No previous search history found.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,275 @@
+@using Microsoft.AspNetCore.Identity
+@using TripAnalyzer.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Trip Analyzer | Travel Intelligence Platform</title>
+    <meta name="description" content="Trip Analyzer evaluates Train, Bus, Flight, and Driving options to recommend the best, cheapest, and fastest travel choice." />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS & Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" />
+    
+    <!-- Custom Design System -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid max-w-7xl">
+            <a class="brand-logo" asp-controller="Home" asp-action="Index">
+                <div class="logo-icon">
+                    <i class="bi bi-compass-fill"></i>
+                </div>
+                <span>TRIP ANALYZER</span>
+            </a>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" style="color: var(--text-primary);">
+                <i class="bi bi-list fs-2"></i>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")" asp-controller="Home" asp-action="Index">
+                            <i class="bi bi-compass me-1"></i> Analyze Trip
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "HowItWorks" ? "active" : "")" asp-controller="Home" asp-action="HowItWorks">
+                            <i class="bi bi-cpu me-1"></i> How It Works
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Faq" ? "active" : "")" asp-controller="Home" asp-action="Faq">
+                            <i class="bi bi-question-circle me-1"></i> FAQ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Contact" ? "active" : "")" asp-controller="Home" asp-action="Contact">
+                            <i class="bi bi-envelope me-1"></i> Contact
+                        </a>
+                    </li>
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Trip" && ViewContext.RouteData.Values["Action"]?.ToString() == "History" ? "active" : "")" asp-controller="Trip" asp-action="History">
+                                <i class="bi bi-clock-history me-1"></i> Trip History
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Account" && ViewContext.RouteData.Values["Action"]?.ToString() == "Profile" ? "active" : "")" asp-controller="Account" asp-action="Profile">
+                                <i class="bi bi-person me-1"></i> Profile
+                            </a>
+                        </li>
+                    }
+                </ul>
+
+                <div class="d-flex align-items-center gap-3">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        var currentUser = await UserManager.GetUserAsync(User);
+                        var isUserAdmin = User.IsInRole("Admin");
+
+                        <a asp-controller="Trip" asp-action="History" class="btn btn-secondary-custom btn-sm">
+                            <i class="bi bi-clock-history me-1"></i> Trip History
+                        </a>
+
+                        <div class="dropdown">
+                            <button class="btn btn-secondary-custom btn-sm dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle fs-6 text-primary"></i>
+                                <span>@(currentUser?.FullName ?? User.Identity?.Name)</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="background: var(--bg-card); border-color: var(--border-default);">
+                                @if (isUserAdmin)
+                                {
+                                    <li>
+                                        <a class="dropdown-item fw-semibold" style="color: var(--accent-primary);" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                                            <i class="bi bi-speedometer2 me-2"></i> Admin Panel
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider" style="border-color: var(--border-default);"></li>
+                                }
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                                        <i class="bi bi-person me-2"></i> Profile Settings
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Trip" asp-action="History">
+                                        <i class="bi bi-bookmark-star me-2"></i> Saved Trips
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider" style="border-color: var(--border-default);"></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post">
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-secondary-custom btn-sm">Sign In</a>
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-primary-custom btn-sm">Get Started</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Global Toast Alerts -->
+    <div class="container mt-3">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show border-0 bg-success text-white" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show border-0 bg-danger text-white" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["InfoMessage"] != null)
+        {
+            <div class="alert alert-info alert-dismissible fade show border-0 bg-info text-white" role="alert">
+                <i class="bi bi-info-circle-fill me-2"></i> @TempData["InfoMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+    </div>
+
+    <!-- Main Content Body -->
+    <main role="main" class="flex-grow-1">
+        @RenderBody()
+    </main>
+
+    <!-- Floating Trip Assistant Chatbot -->
+    <button id="chatbot-trigger" class="chatbot-trigger-btn shadow-neon" title="Trip Assistant AI" style="background: var(--accent-gradient); border: none; box-shadow: 0 0 20px rgba(193, 89, 46, 0.3); animation: pulseOrb 2s infinite;">
+        <i class="bi bi-stars text-white fs-4"></i>
+    </button>
+
+    <div id="chatbot-window" class="chatbot-window hidden" style="border: 1px solid var(--border-default) !important; background: var(--bg-card) !important; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-radius: var(--radius-md); box-shadow: var(--shadow-lg), 0 0 30px rgba(193, 89, 46, 0.08);">
+        <div class="chatbot-header d-flex justify-content-between align-items-center p-3 border-bottom" style="border-color: var(--border-default) !important; background: var(--bg-section);">
+            <div class="d-flex align-items-center gap-2">
+                <div class="p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; animation: rotateOrb 4s linear infinite; background: var(--chip-orange); color: var(--accent-primary);">
+                    <i class="bi bi-stars"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold" style="font-size: 0.95rem; color: var(--text-primary);">Trip Assistant</h6>
+                    <small class="text-secondary fs-8 d-flex align-items-center gap-1">
+                        <span class="online-indicator" style="background-color: var(--accent-info);"></span> Travel Intelligence
+                    </small>
+                </div>
+            </div>
+            <button id="chatbot-close" class="btn-close fs-8" style="opacity: 0.8;"></button>
+        </div>
+        <div id="chatbot-body" class="chatbot-body p-3" style="overflow-y: auto; height: 320px; background: var(--bg-base);">
+            <!-- Dynamic chat bubbles injected via JS -->
+        </div>
+        <div class="chatbot-footer p-3 border-top d-flex gap-2" style="border-color: var(--border-default) !important; background: var(--bg-section);">
+            <input type="text" id="chatbot-input" class="form-control chatbot-input-custom" placeholder="Ask anything about travel..." autocomplete="off" />
+            <button type="button" id="chatbot-send" class="btn-send-custom" style="background: var(--accent-gradient) !important;">
+                <i class="bi bi-send-fill text-white"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Disclaimer Banner -->
+    <div class="disclaimer-banner-container container my-4" role="region" aria-label="Important travel disclaimer">
+        <div class="disclaimer-banner">
+            <div class="disclaimer-icon-wrapper" aria-hidden="true">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <span class="visually-hidden">Warning:</span>
+            <div class="disclaimer-text-wrapper">
+                <div class="disclaimer-marquee-content">
+                    <span class="disclaimer-msg">Trip Analyzer provides estimated/benchmark travel recommendations based on available data; it is not a live booking platform.</span>
+                    <span class="disclaimer-msg" aria-hidden="true">Trip Analyzer provides estimated/benchmark travel recommendations based on available data; it is not a live booking platform.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-custom">
+        <div class="container text-center text-md-start">
+            <div class="row gy-4 mb-4 justify-content-between">
+                <!-- LEFT COLUMN -->
+                <div class="col-lg-4 col-md-6 col-12">
+                    <a class="brand-logo mb-3 d-inline-flex" asp-controller="Home" asp-action="Index">
+                        <div class="logo-icon"><i class="bi bi-compass-fill"></i></div>
+                        <span>TRIP ANALYZER</span>
+                    </a>
+                    <p class="small text-secondary mb-2" style="font-weight: 500; font-size: 0.95rem; color: var(--text-primary) !important;">
+                        Travel Intelligence, Simplified.
+                    </p>
+                    <p class="small text-muted">
+                        Intelligent routes, rates, and optimal recommendations.
+                    </p>
+                </div>
+                
+                <!-- PRODUCT COLUMN -->
+                <div class="col-lg-2 col-md-6 col-12">
+                    <h6 class="fw-bold mb-3 text-uppercase tracking-wider" style="font-size: 0.8rem; color: var(--text-primary);">Product</h6>
+                    <ul class="list-unstyled small d-flex flex-column gap-2">
+                        <li><a asp-controller="Home" asp-action="Index" class="text-secondary text-decoration-none">Analyze Journey</a></li>
+                        <li><a asp-controller="Home" asp-action="HowItWorks" class="text-secondary text-decoration-none">Recommendation Engine</a></li>
+                    </ul>
+                </div>
+                
+                <!-- COMPANY COLUMN -->
+                <div class="col-lg-2 col-md-6 col-12">
+                    <h6 class="fw-bold mb-3 text-uppercase tracking-wider" style="font-size: 0.8rem; color: var(--text-primary);">Company</h6>
+                    <ul class="list-unstyled small d-flex flex-column gap-2">
+                        <li><a asp-controller="Home" asp-action="Faq" class="text-secondary text-decoration-none">Knowledge Base</a></li>
+                        <li><a asp-controller="Home" asp-action="Contact" class="text-secondary text-decoration-none">Support</a></li>
+                        <li><a asp-controller="Account" asp-action="Login" class="text-secondary text-decoration-none">Account Access</a></li>
+                        <li><a asp-controller="Account" asp-action="Register" class="text-secondary text-decoration-none">Create Account</a></li>
+                    </ul>
+                </div>
+                
+                <!-- TRAVEL INTELLIGENCE COLUMN -->
+                <div class="col-lg-3 col-md-6 col-12">
+                    <h6 class="fw-bold mb-3 text-uppercase tracking-wider" style="font-size: 0.8rem; color: var(--text-primary);">Travel Intelligence</h6>
+                    <p class="small text-secondary mb-3" style="line-height: 1.5; font-size: 0.85rem;">
+                        Estimated data is transparently labeled for demo and benchmark routes.
+                    </p>
+                    <span class="badge px-2 py-1 fs-9" style="background: var(--chip-teal); color: var(--accent-secondary); border: 1px solid var(--border-default);">v1.0.0 Stable</span>
+                </div>
+            </div>
+            
+            <hr class="border-secondary my-3" style="opacity: 0.25; border-color: var(--border-default) !important;" />
+            
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small gap-2 text-secondary" style="font-size: 0.85rem;">
+                <span class="text-center text-md-start">&copy; 2026 TRIP ANALYZER. Travel Intelligence, Simplified. All rights reserved.</span>
+                <span class="fw-semibold mt-1 mt-md-0" style="letter-spacing: 0.02em; color: var(--text-primary);">
+                    Made by <span class="text-secondary" style="color: var(--accent-primary) !important;">Aditya Kumar Gupta</span>
+                </span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

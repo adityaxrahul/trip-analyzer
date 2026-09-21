@@ -1,0 +1,115 @@
+@model IEnumerable<TripAnalyzer.Models.City>
+@{
+    ViewData["Title"] = "Manage Cities";
+    Layout = "_AdminLayout";
+    var districts = ViewBag.Districts as SelectList;
+    var search = ViewBag.Search as string;
+    var districtFilter = ViewBag.DistrictFilter as int?;
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold mb-1" style="color: var(--text-primary);">Cities Manager</h2>
+        <p class="text-secondary small mb-0">Registry of supported cities and coordinates</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary-custom" style="background: var(--accent-gradient) !important; box-shadow: 0 4px 18px rgba(255, 122, 61, 0.3) !important;">
+        <i class="bi bi-plus-circle me-2"></i> Add City
+    </a>
+</div>
+
+<!-- Search and Filters Widget -->
+<div class="glass-panel mb-4 p-3.5">
+    <form method="get" class="row g-3 align-items-end">
+        <div class="col-md-5">
+            <label class="form-label-custom">Search Name or Code</label>
+            <input type="text" name="search" value="@search" class="form-control form-control-custom" placeholder="e.g. Siwan or SWN" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label-custom">Filter District</label>
+            <select name="districtFilter" asp-items="districts" class="form-select">
+                <option value="">-- All Districts --</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary-custom flex-grow-1">
+                <i class="bi bi-search me-1"></i> Filter
+            </button>
+            <a asp-action="Index" class="btn btn-secondary-custom">
+                Clear
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Cities Table -->
+<div class="glass-panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-custom mb-0">
+            <thead>
+                <tr>
+                    <th class="px-4 py-3">City (Code)</th>
+                    <th class="py-3">District</th>
+                    <th class="py-3">State</th>
+                    <th class="py-3">Coordinates</th>
+                    <th class="py-3 text-center">Status</th>
+                    <th class="px-4 py-3 text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-5">
+                            <i class="bi bi-geo-alt fs-1 d-block mb-2"></i>
+                            No city records found matching your filters.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="px-4 py-3 font-heading fw-semibold" style="color: var(--text-primary);">
+                                @item.Name 
+                                <span class="text-muted small ms-1">(#@item.CityCode)</span>
+                            </td>
+                            <td class="py-3 text-secondary">
+                                @(item.District?.Name ?? "N/A")
+                            </td>
+                            <td class="py-3">
+                                @item.State 
+                                <span class="text-secondary small ms-1">(@item.StateCode)</span>
+                            </td>
+                            <td class="py-3 text-mono small">
+                                @item.Latitude.ToString("F4"), @item.Longitude.ToString("F4")
+                            </td>
+                            <td class="py-3 text-center">
+                                @if (item.IsActive)
+                                {
+                                    <span class="text-success small fw-bold"><i class="bi bi-circle-fill fs-9 me-1"></i> Active</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small fw-bold"><i class="bi bi-circle-fill fs-9 me-1"></i> Inactive</span>
+                                }
+                            </td>
+                            <td class="px-4 py-3 text-end">
+                                <div class="d-inline-flex gap-2">
+                                    <form asp-action="ToggleActive" asp-route-id="@item.Id" method="post">
+                                        <button type="submit" class="btn btn-sm @(item.IsActive ? "btn-outline-warning" : "btn-outline-success")">
+                                            @(item.IsActive ? "Deactivate" : "Activate")
+                                        </button>
+                                    </form>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-secondary-custom">
+                                        Edit
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

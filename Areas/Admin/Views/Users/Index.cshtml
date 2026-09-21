@@ -1,0 +1,65 @@
+@model List<TripAnalyzer.Models.ApplicationUser>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "User Accounts Management";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold mb-0" style="color: var(--text-primary);">Registered User Accounts (@Model.Count)</h3>
+</div>
+
+<div class="admin-stat-card mb-4">
+    <form method="get" class="row g-2">
+        <div class="col-md-8">
+            <input type="text" name="search" value="@ViewBag.SearchTerm" class="form-control form-control-custom" placeholder="Search users by name, email, or mobile..." />
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+            <button type="submit" class="btn btn-primary-custom w-100">Search</button>
+            <a asp-action="Index" class="btn btn-secondary-custom">Reset</a>
+        </div>
+    </form>
+</div>
+
+<div class="admin-stat-card">
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Email Address</th>
+                    <th>Mobile</th>
+                    <th>Joined Date</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model)
+                {
+                    <tr>
+                        <td class="fw-bold" style="color: var(--text-primary);">@u.FullName</td>
+                        <td>@u.Email</td>
+                        <td>@(u.MobileNumber ?? "N/A")</td>
+                        <td>@u.CreatedAt.ToString("MMM dd, yyyy")</td>
+                        <td>
+                            <span class="badge @(u.IsActive ? "bg-success" : "bg-danger")">
+                                @(u.IsActive ? "Active" : "Deactivated")
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a asp-action="Details" asp-route-id="@u.Id" class="btn btn-sm btn-secondary-custom">Details</a>
+                                <form asp-action="ToggleActive" method="post">
+                                    <input type="hidden" name="id" value="@u.Id" />
+                                    <button type="submit" class="btn btn-sm @(u.IsActive ? "btn-outline-danger" : "btn-outline-success")">
+                                        @(u.IsActive ? "Deactivate" : "Activate")
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

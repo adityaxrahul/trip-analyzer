@@ -1,0 +1,41 @@
+@model List<TripAnalyzer.Models.ChatbotFAQ>
+@{
+    ViewData["Title"] = "Frequently Asked Questions";
+}
+
+<div class="container max-w-4xl py-5">
+    <div class="text-center mb-5">
+        <h6 class="text-info text-uppercase fw-bold">Knowledge Base</h6>
+        <h1 class="fw-extrabold mb-3">Frequently Asked Questions</h1>
+        <p class="text-secondary">Everything you need to know about Trip Analyzer's recommendations and services.</p>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="accordion accordion-flush glass-panel p-2" id="faqAccordion">
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                var faq = Model[i];
+                <div class="accordion-item bg-transparent border-bottom border-secondary">
+                    <h2 class="accordion-header" id="heading-@faq.Id">
+                        <button class="accordion-button collapsed bg-transparent text-white fw-bold shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@faq.Id">
+                            <span class="badge bg-secondary me-3">@faq.Category</span>
+                            @faq.Question
+                        </button>
+                    </h2>
+                    <div id="collapse-@faq.Id" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-secondary">
+                            @faq.Answer
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center text-muted py-5">
+            <p>No FAQs available right now.</p>
+        </div>
+    }
+</div>

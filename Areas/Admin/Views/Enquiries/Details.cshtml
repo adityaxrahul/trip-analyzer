@@ -1,0 +1,131 @@
+@model TripAnalyzer.Models.Enquiry
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = $"Enquiry details: {Model.Subject}";
+}
+
+@* TempData alerts *@
+@if (TempData["SuccessMessage"] != null) {
+    <div class="alert alert-success" role="alert">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null) {
+    <div class="alert alert-danger" role="alert">@TempData["ErrorMessage"]</div>
+}
+
+<div class="mb-4">
+    <a asp-action="Index" class="text-secondary text-decoration-none small">
+        <i class="bi bi-arrow-left me-1"></i> Back to Enquiries Inbox
+    </a>
+    <h2 class="fw-bold mt-2" style="color: var(--text-primary);">Enquiry Details</h2>
+    <p class="text-secondary small">Inspect query and update status</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-8">
+        <!-- Message Card -->
+        <div class="admin-stat-card mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-default) !important;">
+                <h5 class="fw-bold mb-0" style="color: var(--text-primary);"><i class="bi bi-chat-left-text-fill text-primary me-2"></i> Enquiry Message</h5>
+                <span class="badge @(Model.Status == "Pending" ? "bg-warning text-dark" : Model.Status == "In Progress" ? "bg-info text-dark" : "bg-success")">
+                    @Model.Status
+                </span>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <span class="text-secondary small d-block">Sender Name</span>
+                    <strong style="color: var(--text-primary);">@Model.Name</strong>
+                </div>
+                <div class="col-md-6">
+                    <span class="text-secondary small d-block">Email Address</span>
+                    <a href="mailto:@Model.Email" class="text-info text-decoration-none">@Model.Email</a>
+                </div>
+                <div class="col-md-6">
+                    <span class="text-secondary small d-block">Subject</span>
+                    <strong style="color: var(--text-primary);">@Model.Subject</strong>
+                </div>
+                <div class="col-md-6">
+                    <span class="text-secondary small d-block">Received Date</span>
+                    <strong style="color: var(--text-primary);">@Model.CreatedAt.ToString("MMM dd, yyyy HH:mm:ss")</strong>
+                </div>
+            </div>
+
+            <span class="text-secondary small d-block mb-1">Message Content</span>
+            <div class="p-3 rounded" style="background: var(--bg-card-hover); color: var(--text-primary); border: 1px solid var(--border-default); white-space: pre-wrap; font-size: 0.9rem; line-height: 1.6;">
+                @Model.Message
+            </div>
+        </div>
+
+        <!-- Admin Response Card -->
+        <div class="admin-stat-card">
+            <h5 class="fw-bold mb-3" style="color: var(--text-primary);"><i class="bi bi-reply-all-fill text-success me-2"></i> Response Actions</h5>
+            
+            @if (!string.IsNullOrWhiteSpace(Model.AdminReply))
+            {
+                <div class="mb-4">
+                    <span class="text-secondary small d-block mb-1">Sent Reply (on @(Model.RepliedAt?.ToString("MMM dd, yyyy HH:mm") ?? "N/A"))</span>
+                    <div class="p-3 rounded border border-success-subtle text-success small" style="background: var(--bg-card-hover); white-space: pre-wrap; border-color: rgba(62, 122, 86, 0.3) !important;">
+                        @Model.AdminReply
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning border-0 bg-warning text-dark mb-4 small" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> No reply has been dispatched for this enquiry yet.
+                </div>
+            }
+
+            <div class="d-flex gap-2">
+                <a asp-action="Reply" asp-route-id="@Model.Id" class="btn btn-primary-custom" style="background: var(--accent-gradient) !important;">
+                    <i class="bi bi-reply me-1"></i> @(string.IsNullOrWhiteSpace(Model.AdminReply) ? "Write Reply Email" : "Reply Again")
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Settings Panel -->
+        <div class="admin-stat-card">
+            <h5 class="fw-bold mb-4" style="color: var(--text-primary);"><i class="bi bi-gear-fill text-secondary me-2"></i> Admin Controls</h5>
+
+            <div class="mb-4">
+                <label class="form-label-custom mb-2">Update Status State</label>
+                <div class="d-flex flex-column gap-2">
+                    <form asp-action="UpdateStatus" method="post">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="status" value="Pending" />
+                        <button type="submit" class="btn btn-sm btn-secondary-custom w-100 text-start @(Model.Status == "Pending" ? "active border border-warning" : "")">
+                            <i class="bi bi-hourglass me-2 text-warning"></i> Return to Pending
+                        </button>
+                    </form>
+                    
+                    <form asp-action="UpdateStatus" method="post">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="status" value="In Progress" />
+                        <button type="submit" class="btn btn-sm btn-secondary-custom w-100 text-start @(Model.Status == "In Progress" ? "active border border-info" : "")">
+                            <i class="bi bi-play-circle me-2 text-info"></i> Mark In Progress
+                        </button>
+                    </form>
+
+                    <form asp-action="UpdateStatus" method="post">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="status" value="Resolved" />
+                        <button type="submit" class="btn btn-sm btn-secondary-custom w-100 text-start @(Model.Status == "Resolved" ? "active border border-success" : "")">
+                            <i class="bi bi-check-circle me-2 text-success"></i> Mark Resolved
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="border-top border-secondary pt-3 mt-3" style="border-color: rgba(255,255,255,0.06) !important;">
+                <form asp-action="Delete" method="post" onsubmit="return confirm('Are you sure you want to delete this enquiry from the system permanently? This action is irreversible.');">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-sm btn-outline-danger w-100 text-start">
+                        <i class="bi bi-trash-fill me-2"></i> Delete Enquiry
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

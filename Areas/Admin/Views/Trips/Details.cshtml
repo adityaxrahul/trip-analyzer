@@ -1,0 +1,53 @@
+@model TripAnalyzer.Models.Trip
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = $"Trip Log #{Model.Id}: {Model.Source} to {Model.Destination}";
+}
+
+<div class="max-w-4xl mx-auto">
+    <div class="mb-4">
+        <a asp-action="Index" class="btn btn-sm btn-secondary-custom mb-2"><i class="bi bi-arrow-left"></i> Back to Trips Log</a>
+        <h2 class="fw-bold mb-0" style="color: var(--text-primary);">@Model.Source → @Model.Destination</h2>
+        <div class="text-secondary small">
+            User: @(Model.User?.FullName ?? "Guest User") • Date: @Model.TravelDate.ToString("MMM dd, yyyy") • @Model.Passengers Pax • Distance: @Model.DistanceKm km
+        </div>
+    </div>
+
+    <div class="admin-stat-card mb-4">
+        <h5 class="fw-bold mb-3" style="color: var(--text-primary);">Evaluated Options Breakdown</h5>
+        <div class="table-responsive">
+            <table class="table table-custom align-middle">
+                <thead>
+                    <tr>
+                        <th>Mode</th>
+                        <th>Carrier</th>
+                        <th>Calculated Fare</th>
+                        <th>Duration</th>
+                        <th>Score</th>
+                        <th>Flags</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var a in Model.Analyses.OrderByDescending(x => x.OverallScore))
+                    {
+                        int hrs = a.CalculatedDurationMinutes / 60;
+                        int mins = a.CalculatedDurationMinutes % 60;
+
+                        <tr>
+                            <td class="fw-bold" style="color: var(--text-primary);">@a.TransportOption?.Mode</td>
+                            <td class="small text-secondary">@a.TransportOption?.CarrierName</td>
+                            <td class="fw-bold text-success">₹@a.CalculatedPrice.ToString("N0")</td>
+                            <td>@(hrs > 0 ? $"{hrs}h " : "")@($"{mins}m")</td>
+                            <td class="fw-bold text-info fs-5">@a.OverallScore</td>
+                            <td>
+                                @if (a.IsRecommended) { <span class="badge bg-success">Recommended</span> }
+                                @if (a.IsCheapest) { <span class="badge bg-primary">Cheapest</span> }
+                                @if (a.IsFastest) { <span class="badge bg-warning text-dark">Fastest</span> }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

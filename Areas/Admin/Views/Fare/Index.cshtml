@@ -1,0 +1,93 @@
+@model IEnumerable<TripAnalyzer.Models.FareConfiguration>
+@{
+    ViewData["Title"] = "Manage Fares";
+    Layout = "_AdminLayout";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold mb-1" style="color: var(--text-primary);">Fare Configurations</h2>
+        <p class="text-secondary small mb-0">Manage transport base prices, per-kilometer rates, and minimum fares</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary-custom" style="background: var(--accent-gradient) !important; box-shadow: 0 4px 18px rgba(255, 122, 61, 0.3) !important;">
+        <i class="bi bi-plus-circle me-2"></i> Add Configuration
+    </a>
+</div>
+
+<div class="glass-panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-custom mb-0">
+            <thead>
+                <tr>
+                    <th class="px-4 py-3">Travel Mode</th>
+                    <th class="py-3">Base Fare</th>
+                    <th class="py-3">Per Km Rate</th>
+                    <th class="py-3">Minimum Fare</th>
+                    <th class="py-3">Last Updated</th>
+                    <th class="py-3 text-center">Status</th>
+                    <th class="px-4 py-3 text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-5">
+                            <i class="bi bi-cash-stack fs-1 d-block mb-2"></i>
+                            No fare configurations registered.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="px-4 py-3 font-heading fw-bold fs-5" style="color: var(--text-primary);">
+                                @if (item.Mode == "Train") { <i class="bi bi-train-front text-success me-2"></i> }
+                                else if (item.Mode == "Bus") { <i class="bi bi-bus-front text-info me-2"></i> }
+                                else if (item.Mode == "Flight") { <i class="bi bi-airplane text-warning me-2"></i> }
+                                else { <i class="bi bi-car-front text-secondary me-2"></i> }
+                                @item.Mode
+                            </td>
+                            <td class="py-3 fw-semibold" style="color: var(--text-primary);">
+                                ₹@item.BaseFare.ToString("F2")
+                            </td>
+                            <td class="py-3 fw-semibold" style="color: var(--text-primary);">
+                                ₹@item.PerKmRate.ToString("F2") / km
+                            </td>
+                            <td class="py-3 fw-semibold" style="color: var(--text-primary);">
+                                ₹@item.MinimumFare.ToString("F2")
+                            </td>
+                            <td class="py-3 text-secondary small">
+                                @item.UpdatedAt.ToString("MMM dd, yyyy HH:mm")
+                            </td>
+                            <td class="py-3 text-center">
+                                @if (item.IsActive)
+                                {
+                                    <span class="text-success small fw-bold"><i class="bi bi-circle-fill fs-9 me-1"></i> Active</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small fw-bold"><i class="bi bi-circle-fill fs-9 me-1"></i> Inactive</span>
+                                }
+                            </td>
+                            <td class="px-4 py-3 text-end">
+                                <div class="d-inline-flex gap-2">
+                                    <form asp-action="ToggleActive" asp-route-id="@item.Id" method="post">
+                                        <button type="submit" class="btn btn-sm @(item.IsActive ? "btn-outline-warning" : "btn-outline-success")">
+                                            @(item.IsActive ? "Deactivate" : "Activate")
+                                        </button>
+                                    </form>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-secondary-custom">
+                                        Edit
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

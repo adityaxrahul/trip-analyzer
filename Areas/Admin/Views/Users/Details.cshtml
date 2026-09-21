@@ -1,0 +1,104 @@
+@model TripAnalyzer.ViewModels.UserManageViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = $"User Details: {Model.User.FullName}";
+    var userTrips = ViewBag.UserTrips as List<TripAnalyzer.Models.Trip> ?? new List<TripAnalyzer.Models.Trip>();
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <a asp-action="Index" class="btn btn-sm btn-secondary-custom mb-3"><i class="bi bi-arrow-left"></i> Back to Users List</a>
+        <h2 class="fw-bold mb-0" style="color: var(--text-primary);">@Model.User.FullName</h2>
+        <span class="text-secondary">@Model.User.Email</span>
+    </div>
+    <div class="d-flex gap-2">
+        <form asp-action="ToggleAdminRole" method="post">
+            <input type="hidden" name="id" value="@Model.User.Id" />
+            <button type="submit" class="btn btn-sm @(Model.Roles.Contains("Admin") ? "btn-outline-warning" : "btn-outline-info")">
+                <i class="bi bi-shield-lock me-1"></i> @(Model.Roles.Contains("Admin") ? "Revoke Admin Role" : "Grant Admin Role")
+            </button>
+        </form>
+        <form asp-action="ToggleActive" method="post">
+            <input type="hidden" name="id" value="@Model.User.Id" />
+            <button type="submit" class="btn btn-sm @(Model.User.IsActive ? "btn-outline-danger" : "btn-outline-success")">
+                @(Model.User.IsActive ? "Deactivate User" : "Activate User")
+            </button>
+        </form>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show small py-2" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show small py-2" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="admin-stat-card">
+            <div class="text-secondary small uppercase">Total Searches</div>
+            <div class="fs-2 fw-bold text-primary">@Model.TripCount</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-stat-card">
+            <div class="text-secondary small uppercase">Saved Trips</div>
+            <div class="fs-2 fw-bold text-warning">@Model.SavedCount</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-stat-card">
+            <div class="text-secondary small uppercase">Support Enquiries</div>
+            <div class="fs-2 fw-bold text-info">@Model.EnquiryCount</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-stat-card">
+            <div class="text-secondary small uppercase">Roles</div>
+            <div class="fs-5 fw-bold" style="color: var(--text-primary);">@string.Join(", ", Model.Roles)</div>
+        </div>
+    </div>
+</div>
+
+<div class="admin-stat-card">
+    <h5 class="fw-bold mb-3" style="color: var(--text-primary);">User's Recent Analyzed Journeys</h5>
+    @if (userTrips.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-custom small">
+                <thead>
+                    <tr>
+                        <th>Route</th>
+                        <th>Travel Date</th>
+                        <th>Passengers</th>
+                        <th>Analyzed At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in userTrips)
+                    {
+                        <tr>
+                            <td class="fw-bold" style="color: var(--text-primary);">@t.Source → @t.Destination</td>
+                            <td>@t.TravelDate.ToString("MMM dd, yyyy")</td>
+                            <td>@t.Passengers</td>
+                            <td>@t.CreatedAt.ToString("MMM dd, yyyy HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="text-muted text-center py-4">No trip searches recorded for this user yet.</div>
+    }
+</div>

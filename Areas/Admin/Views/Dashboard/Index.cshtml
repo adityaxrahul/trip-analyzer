@@ -1,0 +1,267 @@
+@model TripAnalyzer.ViewModels.AdminDashboardViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Executive Dashboard";
+    var stats = Model.Analytics.Stats;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1" style="color: var(--text-primary);">System Overview</h2>
+        <p class="text-secondary small">Real-time telemetry and travel analytics</p>
+    </div>
+    <span class="badge px-3 py-2" style="background: var(--chip-orange); color: var(--accent-primary); border: 1px solid var(--border-default);">
+        <i class="bi bi-clock-history me-1"></i> Live Metrics
+    </span>
+</div>
+
+<!-- Dashboard Metric Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-2 col-md-4">
+        <div class="admin-stat-card">
+            <div class="text-secondary fs-8 uppercase fw-semibold mb-1">Total Users</div>
+            <div class="display-6 fw-bold mb-0" style="color: var(--text-primary);">@stats.TotalUsers</div>
+            <div class="text-success fs-8 mt-1"><i class="bi bi-arrow-up-short"></i> Active Identity Accounts</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-2 col-md-4">
+        <div class="admin-stat-card">
+            <div class="text-secondary fs-8 uppercase fw-semibold mb-1">Total Trips</div>
+            <div class="display-6 fw-bold mb-0" style="color: var(--accent-primary);">@stats.TotalTrips</div>
+            <div class="text-secondary fs-8 mt-1">Analyzed Journeys</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-2 col-md-4">
+        <div class="admin-stat-card">
+            <div class="text-secondary fs-8 uppercase fw-semibold mb-1">Pending Enquiries</div>
+            <div class="display-6 fw-bold mb-0" style="color: var(--accent-warning);">@stats.PendingEnquiries</div>
+            <div class="text-warning fs-8 mt-1">Needs Response</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-2 col-md-4">
+        <div class="admin-stat-card">
+            <div class="text-secondary fs-8 uppercase fw-semibold mb-1">Saved Trips</div>
+            <div class="display-6 fw-bold mb-0" style="color: var(--accent-info);">@stats.TotalSavedTrips</div>
+            <div class="text-info fs-8 mt-1">User Bookmarks</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-2 col-md-4">
+        <div class="admin-stat-card">
+            <div class="text-secondary fs-8 uppercase fw-semibold mb-1">Popular Destination</div>
+            <div class="fs-4 fw-bold text-success mb-0 text-truncate">@stats.TopDestination</div>
+            <div class="text-secondary fs-8 mt-1">Most Searched City</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-2 col-md-4">
+        <div class="admin-stat-card">
+            <div class="text-secondary fs-8 uppercase fw-semibold mb-1">Top Transport</div>
+            <div class="fs-4 fw-bold mb-0" style="color: var(--accent-secondary);">@stats.PreferredTransport</div>
+            <div class="text-secondary fs-8 mt-1">Highest Winner Rate</div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Canvas Section -->
+<div class="row g-4 mb-4">
+    <div class="col-md-8">
+        <div class="admin-stat-card">
+            <h6 class="fw-bold mb-3" style="color: var(--text-primary);"><i class="bi bi-graph-up text-primary me-2"></i> Trips Analyzed Over Time</h6>
+            <div style="height: 260px;">
+                <canvas id="chartTripsOverTime"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="admin-stat-card">
+            <h6 class="fw-bold mb-3" style="color: var(--text-primary);"><i class="bi bi-pie-chart text-info me-2"></i> Mode Preference Distribution</h6>
+            <div style="height: 260px;" class="d-flex align-items-center justify-content-center">
+                <canvas id="chartTransportDist"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="admin-stat-card">
+            <h6 class="fw-bold mb-3" style="color: var(--text-primary);"><i class="bi bi-pin-map text-success me-2"></i> Top 5 Requested Destinations</h6>
+            <div style="height: 240px;">
+                <canvas id="chartDestinations"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="admin-stat-card">
+            <h6 class="fw-bold mb-3" style="color: var(--text-primary);"><i class="bi bi-envelope text-warning me-2"></i> Support Enquiry Status</h6>
+            <div style="height: 240px;" class="d-flex align-items-center justify-content-center">
+                <canvas id="chartEnquiryStatus"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity Tables -->
+<div class="row g-4">
+    <!-- Recent Searches -->
+    <div class="col-md-6">
+        <div class="admin-stat-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0" style="color: var(--text-primary);">Recent User Searches</h6>
+                <a asp-area="Admin" asp-controller="Trips" asp-action="Index" class="btn btn-sm btn-outline-secondary">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-custom small align-middle">
+                    <thead>
+                        <tr>
+                            <th>Route</th>
+                            <th>User</th>
+                            <th>Date</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.RecentTrips == null || !Model.RecentTrips.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-secondary py-3">No recent user searches recorded.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var t in Model.RecentTrips)
+                            {
+                                <tr>
+                                    <td class="fw-bold" style="color: var(--text-primary);">@t.Source → @t.Destination</td>
+                                    <td>@(t.User?.FullName ?? "Guest User")</td>
+                                    <td>@t.CreatedAt.ToString("MMM dd HH:mm")</td>
+                                    <td class="text-end">
+                                        <a asp-area="Admin" asp-controller="Trips" asp-action="Details" asp-route-id="@t.Id" class="btn btn-xs btn-outline-info" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Inspect</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Enquiries -->
+    <div class="col-md-6">
+        <div class="admin-stat-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0" style="color: var(--text-primary);">Pending Enquiries</h6>
+                <a asp-area="Admin" asp-controller="Enquiries" asp-action="Index" class="btn btn-sm btn-outline-secondary">Inbox</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-custom small align-middle">
+                    <thead>
+                        <tr>
+                            <th>Sender</th>
+                            <th>Subject</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.RecentEnquiries == null || !Model.RecentEnquiries.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-secondary py-3">No pending enquiries found.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var e in Model.RecentEnquiries)
+                            {
+                                <tr>
+                                    <td class="fw-bold" style="color: var(--text-primary);">@e.Name</td>
+                                    <td class="text-truncate" style="max-width: 150px;">@e.Subject</td>
+                                    <td>
+                                        <span class="badge @(e.Status == "Pending" ? "bg-warning text-dark" : e.Status == "In Progress" ? "bg-info text-dark" : "bg-success")">@e.Status</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-area="Admin" asp-controller="Enquiries" asp-action="Details" asp-route-id="@e.Id" class="btn btn-xs btn-outline-info" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">Inspect</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const tripsLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Analytics.TripsOverTime.Labels));
+        const tripsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Analytics.TripsOverTime.Data));
+
+        const modeLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Analytics.TransportDistribution.Labels));
+        const modeData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Analytics.TransportDistribution.Data));
+
+        const destLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Analytics.PopularDestinations.Labels));
+        const destData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Analytics.PopularDestinations.Data));
+
+        const enqLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Analytics.EnquiryStatusBreakdown.Labels));
+        const enqData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Analytics.EnquiryStatusBreakdown.Data));
+
+        // Trips Over Time
+        new Chart(document.getElementById('chartTripsOverTime'), {
+            type: 'line',
+            data: {
+                labels: tripsLabels,
+                datasets: [{
+                    label: 'Trips Analyzed',
+                    data: tripsData,
+                    borderColor: '#C1592E',
+                    backgroundColor: 'rgba(193, 89, 46, 0.10)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        // Transport Distribution
+        new Chart(document.getElementById('chartTransportDist'), {
+            type: 'doughnut',
+            data: {
+                labels: modeLabels,
+                datasets: [{
+                    data: modeData,
+                    backgroundColor: ['#3E7A56', '#1C3A4A', '#B5792A', '#C1592E']
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // Popular Destinations
+        new Chart(document.getElementById('chartDestinations'), {
+            type: 'bar',
+            data: {
+                labels: destLabels,
+                datasets: [{
+                    label: 'Searches',
+                    data: destData,
+                    backgroundColor: '#1C3A4A'
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        // Enquiry Status
+        new Chart(document.getElementById('chartEnquiryStatus'), {
+            type: 'pie',
+            data: {
+                labels: enqLabels,
+                datasets: [{
+                    data: enqData,
+                    backgroundColor: ['#B5792A', '#4A6E7C', '#3E7A56']
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    </script>
+}

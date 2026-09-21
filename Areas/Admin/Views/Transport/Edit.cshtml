@@ -1,0 +1,116 @@
+@model TripAnalyzer.ViewModels.TransportOptionViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Edit Transport Option";
+}
+
+<div class="max-w-3xl mx-auto">
+    <div class="mb-4">
+        <a asp-action="Index" class="btn btn-sm btn-secondary-custom mb-2"><i class="bi bi-arrow-left"></i> Back to Transport List</a>
+        <h2 class="fw-bold mb-0" style="color: var(--text-primary);">Edit Transport Option #@Model.Id</h2>
+    </div>
+
+    <div class="admin-stat-card">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger small py-2"></div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label asp-for="Source" class="form-label-custom"></label>
+                    <input asp-for="Source" class="form-control form-control-custom" required />
+                    <span asp-validation-for="Source" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Destination" class="form-label-custom"></label>
+                    <input asp-for="Destination" class="form-control form-control-custom" required />
+                    <span asp-validation-for="Destination" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Mode" class="form-label-custom"></label>
+                    <select asp-for="Mode" class="form-select form-control-custom">
+                        <option value="Train">Train</option>
+                        <option value="Bus">Bus</option>
+                        <option value="Flight">Flight</option>
+                        <option value="Car">Car</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="CarrierName" class="form-label-custom"></label>
+                    <input asp-for="CarrierName" class="form-control form-control-custom" required />
+                    <span asp-validation-for="CarrierName" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="BasePricePerPassenger" class="form-label-custom"></label>
+                    <input asp-for="BasePricePerPassenger" type="number" step="0.01" class="form-control form-control-custom" required />
+                    <span asp-validation-for="BasePricePerPassenger" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="DurationMinutes" class="form-label-custom"></label>
+                    <input asp-for="DurationMinutes" type="number" class="form-control form-control-custom" required />
+                    <span asp-validation-for="DurationMinutes" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="DistanceKm" class="form-label-custom"></label>
+                    <input asp-for="DistanceKm" type="number" step="0.1" class="form-control form-control-custom" required />
+                    <span asp-validation-for="DistanceKm" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="AvailabilityScore" class="form-label-custom"></label>
+                    <input asp-for="AvailabilityScore" type="number" step="0.1" class="form-control form-control-custom" />
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ComfortScore" class="form-label-custom"></label>
+                    <input asp-for="ComfortScore" type="number" step="0.1" class="form-control form-control-custom" />
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="EcoRating" class="form-label-custom"></label>
+                    <input asp-for="EcoRating" type="number" step="0.1" class="form-control form-control-custom" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="DepartureTime" class="form-label-custom"></label>
+                    <input asp-for="DepartureTime" class="form-control form-control-custom" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="ArrivalTime" class="form-label-custom"></label>
+                    <input asp-for="ArrivalTime" class="form-control form-control-custom" />
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Amenities" class="form-label-custom"></label>
+                    <input asp-for="Amenities" class="form-control form-control-custom" />
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-check mt-3">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label" style="color: var(--text-primary);"></label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-check mt-3">
+                        <input asp-for="IsEstimatedData" class="form-check-input" />
+                        <label asp-for="IsEstimatedData" class="form-check-label" style="color: var(--text-primary);"></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <a asp-action="Index" class="btn btn-secondary-custom">Cancel</a>
+                <button type="submit" class="btn btn-primary-custom px-4">Update Option</button>
+            </div>
+        </form>
+    </div>
+</div>

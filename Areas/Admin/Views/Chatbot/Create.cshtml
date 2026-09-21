@@ -1,0 +1,57 @@
+@model TripAnalyzer.ViewModels.ChatbotFaqManageViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Add Chatbot FAQ";
+}
+
+<div class="max-w-2xl mx-auto">
+    <div class="mb-4">
+        <a asp-action="Index" class="btn btn-sm btn-secondary-custom mb-2"><i class="bi bi-arrow-left"></i> Back to FAQs List</a>
+        <h2 class="fw-bold mb-0" style="color: var(--text-primary);">Add Chatbot FAQ</h2>
+    </div>
+
+    <div class="admin-stat-card">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger small py-2"></div>
+
+            <div class="mb-3">
+                <label asp-for="Question" class="form-label-custom"></label>
+                <input asp-for="Question" class="form-control form-control-custom" placeholder="e.g. How does Trip Analyzer calculate recommendations?" required />
+                <span asp-validation-for="Question" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Answer" class="form-label-custom"></label>
+                <textarea asp-for="Answer" class="form-control form-control-custom" rows="4" placeholder="Detailed explanation answer..." required></textarea>
+                <span asp-validation-for="Answer" class="text-danger small"></span>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label asp-for="Category" class="form-label-custom"></label>
+                    <input asp-for="Category" class="form-control form-control-custom" placeholder="General, Pricing, Account, Support" required />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="DisplayOrder" class="form-label-custom"></label>
+                    <input asp-for="DisplayOrder" type="number" class="form-control form-control-custom" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Keywords" class="form-label-custom"></label>
+                <input asp-for="Keywords" class="form-control form-control-custom" placeholder="e.g. score, calculate, recommendation, weight" />
+                <span class="text-muted fs-8">Comma-separated search keywords for matching user queries</span>
+            </div>
+
+            <div class="form-check mb-4">
+                <input asp-for="IsActive" class="form-check-input" />
+                <label asp-for="IsActive" class="form-check-label" style="color: var(--text-primary);"></label>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <a asp-action="Index" class="btn btn-secondary-custom">Cancel</a>
+                <button type="submit" class="btn btn-primary-custom px-4">Create FAQ</button>
+            </div>
+        </form>
+    </div>
+</div>
