@@ -16,6 +16,12 @@ RUN dotnet publish "TripAnalyzer.csproj" -c Release -o /app/publish /p:UseAppHos
 
 # Runtime image setup
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+
+# Install required Linux runtime dependency
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libgssapi-krb5-2 \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 COPY --from=publish /app/publish .
 
