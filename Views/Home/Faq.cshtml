@@ -18,7 +18,7 @@
                 var faq = Model[i];
                 <div class="accordion-item bg-transparent border-bottom border-secondary">
                     <h2 class="accordion-header" id="heading-@faq.Id">
-                        <button class="accordion-button collapsed bg-transparent text-white fw-bold shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@faq.Id">
+                        <button class="accordion-button collapsed bg-transparent fw-bold shadow-none" style="color: var(--text-primary);" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@faq.Id">
                             <span class="badge bg-secondary me-3">@faq.Category</span>
                             @faq.Question
                         </button>

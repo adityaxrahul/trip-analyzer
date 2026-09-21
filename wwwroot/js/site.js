@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initDistrictAutocomplete();
     initScrollAnimations();
     initHeroParallax();
-    
+
     const heroIframe = document.getElementById('hero-3d-iframe');
     if (heroIframe) {
         heroIframe.addEventListener('load', () => onIframeLoad(heroIframe));
@@ -235,7 +235,7 @@ function initChatbot() {
         bodyEl.scrollTop = bodyEl.scrollHeight;
     }
 
-    window.sendSuggestedQuestion = function(q) {
+    window.sendSuggestedQuestion = function (q) {
         sendChatMessage(q);
     };
 }
@@ -243,10 +243,10 @@ function initChatbot() {
 function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/&/g, "&amp;")
-              .replace(/</g, "&lt;")
-              .replace(/>/g, "&gt;")
-              .replace(/"/g, "&quot;")
-              .replace(/'/g, "&#039;");
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 function escapeJs(str) {
@@ -282,7 +282,7 @@ function setupAutocomplete(inputId, resultsId) {
         resultsDiv.className = 'autocomplete-results list-group position-absolute w-100 shadow-sm';
         resultsDiv.style.zIndex = '1050';
         resultsDiv.style.display = 'none';
-        
+
         // Make parent relative
         if (input.parentElement) {
             input.parentElement.style.position = 'relative';
@@ -292,7 +292,7 @@ function setupAutocomplete(inputId, resultsId) {
 
     let timeout = null;
 
-    input.addEventListener('input', function() {
+    input.addEventListener('input', function () {
         clearTimeout(timeout);
         const query = this.value.trim();
 
@@ -306,7 +306,7 @@ function setupAutocomplete(inputId, resultsId) {
                 const response = await fetch(`/api/districts/search?q=${encodeURIComponent(query)}`);
                 if (!response.ok) throw new Error('Network response was not ok');
                 const data = await response.json();
-                
+
                 resultsDiv.innerHTML = '';
                 if (data && data.length > 0) {
                     data.forEach(item => {
@@ -314,7 +314,7 @@ function setupAutocomplete(inputId, resultsId) {
                         div.type = 'button';
                         div.className = 'list-group-item list-group-item-action autocomplete-item';
                         div.innerHTML = `<i class="bi bi-geo-alt text-muted me-2"></i> ${escapeHtml(item.displayName)}`;
-                        div.onclick = function() {
+                        div.onclick = function () {
                             input.value = item.name;
                             resultsDiv.style.display = 'none';
                         };
@@ -332,7 +332,7 @@ function setupAutocomplete(inputId, resultsId) {
     });
 
     // Hide autocomplete when clicking outside
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target !== input && e.target !== resultsDiv) {
             resultsDiv.style.display = 'none';
         }
@@ -344,17 +344,17 @@ function onIframeLoad(iframe) {
     try {
         const frameDoc = iframe.contentDocument || iframe.contentWindow.document;
         if (!frameDoc) return;
-        
+
         // Find the canvas inside the iframe (SylvaHero canvas is #scene)
         const canvas = frameDoc.querySelector('#scene');
         if (!canvas) return;
-        
+
         // Isolate canvas using ThreeUI canonical data attributes
         canvas.setAttribute("data-threeui-background-layer", "");
         canvas.setAttribute("data-threeui-background-fill", "");
-        
+
         frameDoc.documentElement.setAttribute("data-threeui-presentation", "background");
-        
+
         // Add style to iframe to hide rest of document and make background transparent
         const presentationStyle = frameDoc.createElement("style");
         presentationStyle.id = "threeui-background-presentation";
@@ -387,12 +387,12 @@ function onIframeLoad(iframe) {
             }
         `;
         frameDoc.head.appendChild(presentationStyle);
-        
+
         // Retrigger resize within iframe content window
         iframe.contentWindow.requestAnimationFrame(() => {
             iframe.contentWindow.dispatchEvent(new Event("resize"));
         });
-        
+
         // Fade in iframe
         iframe.style.opacity = "1";
     } catch (e) {
@@ -463,7 +463,7 @@ function initHeroParallax() {
         const rect = heroWrapper.getBoundingClientRect();
         const x = e.clientX - rect.left - rect.width / 2;
         const y = e.clientY - rect.top - rect.height / 2;
-        
+
         const tiltX = (y / rect.height) * 20;
         const tiltY = -(x / rect.width) * 20;
 
